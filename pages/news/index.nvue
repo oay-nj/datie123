@@ -12,7 +12,9 @@
 			</view>
 			<template v-slot:right>
 				<view class="city">
-					<text>铁人三项</text>
+					<picker @change="bindPickerChange" :value="typeIndex" :range="array" range-key="type">
+						<view class="uni-input">{{array[typeIndex].type}}</view>
+					</picker>
 					<uni-icons type="down"></uni-icons>
 				</view>
 			</template>
@@ -42,6 +44,49 @@
 				</view>
 			</scroll-view>
 		</uni-drawer>
+		<uni-card title="文章">
+			<template v-slot:title>
+				<view class='section-item'>
+					<image class="section-image" src="/static/thunderbolt.png" mode="aspectFit" />
+					<text>文章</text>
+				</view>
+			</template>
+			<text>暂无文章</text>
+		</uni-card>
+		<uni-card title="装备">
+			<template v-slot:title>
+				<view class='section-item'>
+					<image class="section-image" src="/static/riFill-riding-fill.png" mode="aspectFit" />
+					<text>装备</text>
+				</view>
+			</template>
+			<view class="city">
+				<picker @change="bindGearPickerChange" :value="gearIndex" :range="gearArray" range-key="type">
+					<view class="uni-input">{{gearArray[gearIndex].type}}</view>
+				</picker>
+				<uni-icons type="down"></uni-icons>
+			</view>
+			<uni-grid :column="2" :showBorder="false" :square="false">
+				<uni-grid-item v-for="(item, index) in gearList" :key="index">
+					<uni-list-item :title="item.title" :note="item.description" :thumb="item.icon" thumb-size="lg"
+						:ellipsis="1" :border="false" />
+				</uni-grid-item>
+			</uni-grid>
+		</uni-card>
+		<uni-card title="训练">
+			<template v-slot:title>
+				<view class='section-item'>
+					<image class="section-image" src="/static/iconPark-muscle.png" mode="aspectFit" />
+					<text>训练</text>
+				</view>
+			</template>
+			<uni-grid :column="2" :showBorder="false" :square="false">
+				<uni-grid-item v-for="(item, index) in trainList" :key="index">
+					<uni-list-item :title="item.title" :note="item.description" :ellipsis="1" :border="false" link
+						@click="openExternalLink(item.link_main)" />
+				</uni-grid-item>
+			</uni-grid>
+		</uni-card>
 	</view>
 </template>
 
@@ -51,6 +96,7 @@
 	// #endif
 
 	import newsPage from './news-page.nvue';
+	import EntryModel from '../../model/entryModel';
 
 	// 缓存每页最多
 	const MAX_CACHE_DATA = 100;
@@ -64,51 +110,38 @@
 		},
 		data() {
 			return {
-				tabList: [{
-					id: "tab01",
-					name: '最新',
-					newsid: 0
+				array: [{
+					type: '铁人三项'
 				}, {
-					id: "tab02",
-					name: '大公司',
-					newsid: 23
+					type: '跑步'
 				}, {
-					id: "tab03",
-					name: '内容',
-					newsid: 223
+					type: '游泳'
 				}, {
-					id: "tab04",
-					name: '消费',
-					newsid: 221
-				}, {
-					id: "tab05",
-					name: '娱乐',
-					newsid: 225
-				}, {
-					id: "tab06",
-					name: '区块链',
-					newsid: 208
+					type: '自行车'
 				}],
-				tabIndex: 0,
-				cacheTab: [],
-				scrollInto: "",
-				navigateFlag: false,
-				indicatorLineLeft: 0,
-				indicatorLineWidth: 0,
-				isTap: false
+				typeIndex: 0,
+
+				gearArray: [{
+					type: '参赛装备清单'
+				}, {
+					type: '跑步'
+				}, {
+					type: '骑行'
+				}, {
+					type: '游泳'
+				}, {
+					type: '运动防护'
+				}, {
+					type: '运动配件'
+				}],
+				gearIndex: 0,
+				gearList: [],
+				trainList: [],
 			}
 		},
 		onReady() {
-
-			this.pageList = [];
-			for (var i = 0; i < this.tabList.length; i++) {
-				let item = this.$refs['page' + i]
-				if (Array.isArray(item)) {
-					this.pageList.push(item[0])
-				} else {
-					this.pageList.push(item)
-				}
-			}
+			this.queryData();
+			this.queryTrainData();
 		},
 		methods: {
 			getElementSize(dom, ref, id) {
@@ -126,8 +159,80 @@
 			closeDrawer() {
 				this.$refs.showLeft.close();
 			},
+			bindPickerChange: function(e) {
+				console.log('picker发送选择改变，携带值为：' + e.detail.value)
+				this.typeIndex = e.detail.value
+				this.queryData();
+			},
+			bindGearPickerChange: function(e) {
+				console.log('picker发送选择改变，携带值为：' + e.detail.value)
+				this.gearIndex = e.detail.value
+				this.queryData();
+			},
+			openExternalLink(url) {
+				// #ifdef H5
+				window.location.href = url; // 替换为你的外部链接
+				// #endif
+				// #ifdef MP-WEIXIN || MP-ALIPAY || MP-TOUTIAO || MP-QQ || APP-PLUS
+				uni.navigateTo({
+					url: url // 替换为你的外部链接
+				});
+				// #endif
+			},
+			queryData() {
+				let sportType = this.array[this.typeIndex].type;
+				let rank2 = this.gearArray[this.gearIndex].type;
+				uni.request({
+					url: 'https://www.datie123.com/entry/getEntryList',
+					method: 'GET',
+					data: {
+						sport_type: sportType,
+						rank1: "装备",
+						rank2: rank2
+					}
+				}).then((result) => {
+					console.log("#######", result);
+					if (result.statusCode === 200) {
+						// 成功处理
+						let resList = [];
+						let json = result.data;
+						if (json.code == 0) {
+							let res = json.entry_list;
 
+							for (let obj of res) {
+								let entry = EntryModel.fromJSON(obj);
+								resList.push(entry);
+							}
+						}
+						this.gearList = resList;
+					}
+				});
+			},
+			queryTrainData() {
+				uni.request({
+					url: 'https://www.datie123.com/entry/getEntryList',
+					method: 'GET',
+					data: {
+						sport_type: "铁人三项",
+						rank1: "训练"
+					}
+				}).then((result) => {
+					if (result.statusCode === 200) {
+						// 成功处理
+						let resList = [];
+						let json = result.data;
+						if (json.code == 0) {
+							let res = json.entry_list;
 
+							for (let obj of res) {
+								let entry = EntryModel.fromJSON(obj);
+								resList.push(entry);
+							}
+						}
+						this.trainList = resList;
+					}
+				});
+			}
 
 		}
 	}
@@ -144,7 +249,7 @@
 	.drawer-text {
 		margin-left: 6px;
 	}
-	
+
 	.drawer-item {
 		/* #ifndef APP-PLUS-NVUE */
 		display: flex;
@@ -159,6 +264,21 @@
 		// width: 160rpx;
 		// margin-left: 4px;
 	}
+
+	.section-item {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		// flex: 1;
+		flex-direction: row;
+		// background-color: aqua;
+		align-items: center;
+		justify-content: flex-start;
+		margin-top: 6px;
+		// width: 160rpx;
+		// margin-left: 4px;
+	}
+
 	.city {
 		/* #ifndef APP-PLUS-NVUE */
 		display: flex;
@@ -171,6 +291,18 @@
 		// width: 160rpx;
 		// margin-left: 4px;
 	}
+
+	.section-image {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		// flex: 1;
+		width: 20px;
+		height: 20px;
+		margin-right: 6px;
+		// background-color: #ff0000;
+	}
+
 	.drawer-image {
 		/* #ifndef APP-PLUS-NVUE */
 		display: flex;
