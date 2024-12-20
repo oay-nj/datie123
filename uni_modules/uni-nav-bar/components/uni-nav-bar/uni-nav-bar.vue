@@ -255,7 +255,7 @@
 
 	.uni-navbar__header-btns {
 		/* #ifndef APP-NVUE */
-		overflow: hidden;
+		overflow: visible;
 		display: flex;
 		/* #endif */
 		flex-wrap: nowrap;

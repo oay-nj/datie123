@@ -5,13 +5,7 @@
     },
     {
       "path": "pages/news/detail",
-      "style": {
-        "app-plus": {
-          "titleNView": {
-            "type": "transparent"
-          }
-        }
-      }
+      "style": {}
     }
   ],
   "globalStyle": {

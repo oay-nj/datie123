@@ -48,33 +48,3 @@ export default class EntryModel {
     );
   }
 }
-
-// 假设这是从接口获取的JSON数据
-let jsonData = {
-  "entry_id": "CT2412062120534074",
-  "sport_type": "铁人三项",
-  "rank1": "装备",
-  "rank2": "运动配件",
-  "rank3": "铁三服",
-  "rank4": null,
-  "title": "2XU",
-  "icon": null,
-  "link_main": null,
-  "description": null,
-  "add_date": "2024-12-06 21:20:53",
-  "add_author": null,
-  "link_taobao": null,
-  "link_jd": null,
-  "link_wechat": null,
-  "created_at": "2024-12-06 21:20:53",
-  "updated_at": "2024-12-06 21:20:53",
-  "deleted_at": null,
-  "link_redbook": null,
-  "wechat_public": null
-};
-
-// 使用静态方法从JSON数据创建Entry对象
-let entry = EntryModel.fromJSON(jsonData);
-
-// 访问对象的属性
-console.log(entry.title); // 输出: 2XU
