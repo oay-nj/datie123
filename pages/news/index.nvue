@@ -77,7 +77,12 @@
 				<view class="hr-line"></view>
 				<horizontalScroller :tabs="gameRank3" @tab-change="handleGameRank3Selected"></horizontalScroller>
 				<view class="tag-container">
-					<uni-tag class="tag-padding" v-for="(tag, index) in gameRank4" :key="index" :text="tag" custom-style="background-color: #EFEFEF; border: none; color: #333333" @click="onSelectRan4(tag)">
+					<uni-tag class="tag-padding" v-for="(tag, index) in gameRank4" 
+					:key="index" :text="tag" 
+					:custom-style="tag === gameRank4selected ? 
+					'background-color: #CE2C32; border: none; color: #FFFFFF' : 
+					'background-color: #EFEFEF; border: none; color: #333333'" 
+					@click="onSelectGameRank4(tag)">
 					</uni-tag>
 				</view>
 			</template>
@@ -111,19 +116,22 @@
 				<view class="hr-line"></view>
 				<horizontalScroller :tabs="gearRank3" @tab-change="handleGearRank3Selected"></horizontalScroller>
 				<view class="tag-container">
-					<uni-tag class="tag-padding" v-for="(tag, index) in gearRank4" :key="index" :text="tag" custom-style="background-color: #EFEFEF; border: none; color: #333333" @click="onSelectRan4(tag)">
+					<uni-tag class="tag-padding" v-for="(tag, index) in gearRank4" 
+					:key="index" :text="tag" :custom-style="tag === gearRank4selected ?
+					'background-color: #CE2C32; border: none; color: #FFFFFF' : 
+					'background-color: #EFEFEF; border: none; color: #333333'"
+					@click="onSelectGearRank4(tag)">
 					</uni-tag>
 				</view>
 			</template>
 			<uni-grid :column="2" :showBorder="false" :square="false">
 				<uni-grid-item v-for="(item, index) in filterGearList" :key="index" @click="onClickGearDetailItem(item)">
 					<view class="city">
-						<image :src="item.icon" style="width: 32px; height: 32px; padding-right: 5px;"></image>
+						<image :src="item.icon" style="width: 36px; height: 36px; padding-right: 5px;"></image>
 						<view>
+							<text class="grid-item-title">{{item.brand}}</text>
 							<text class="grid-item-title">{{item.title}}</text>
-							<text class="grid-item-title">{{item.description}}</text>
 						</view>
-						
 					</view>
 				</uni-grid-item>
 			</uni-grid>
@@ -144,7 +152,12 @@
 				<view class="hr-line"></view>
 				<horizontalScroller :tabs="teamRank3" @tab-change="handleTeamRank3Selected"></horizontalScroller>
 				<view class="tag-container">
-					<uni-tag class="tag-padding" v-for="(tag, index) in teamRank4" :key="index" :text="tag" custom-style="background-color: #EFEFEF; border: none; color: #333333" @click="onSelectRan4(tag)">
+					<uni-tag class="tag-padding" v-for="(tag, index) in teamRank4" 
+					:key="index" :text="tag" 
+					:custom-style="tag === teamRank4selected ? 
+					'background-color: #CE2C32; border: none; color: #FFFFFF' : 
+					'background-color: #EFEFEF; border: none; color: #333333'" 
+					@click="onSelectTeamRank4(tag)">
 					</uni-tag>
 				</view>
 			</template>
@@ -169,7 +182,6 @@
 	const dom = weex.requireModule('dom');
 	// #endif
 
-	import newsPage from './news-page.nvue';
 	import EntryModel from '../../model/entryModel';
 	import horizontalScroller from '../../components/horizontal-scroller.vue';
 	// 缓存每页最多
@@ -180,8 +192,7 @@
 
 	export default {
 		components: {
-			newsPage,
-			horizontalScroller
+			horizontalScroller,
 		},
 		computed: {
 			filterGameList() {
@@ -237,12 +248,6 @@
 			return {
 				array: [{
 					type: '铁人三项'
-				}, {
-					type: '跑步'
-				}, {
-					type: '游泳'
-				}, {
-					type: '自行车'
 				}],
 				typeIndex: 0,
 				gameHierarchy: {},
@@ -319,8 +324,14 @@
 				// this.selectedTab = selectedTab;
 				console.log('选中的标签:', JSON.stringify(selectedTab));
 			},
-			onSelectRan4(tab) {
+			onSelectGameRank4(tab) {
 				this.gameRank4selected = tab;
+			},
+			onSelectGearRank4(tab) {
+				this.gearRank4selected = tab;
+			},
+			onSelectTeamRank4(tab) {
+				this.teamRank4selected = tab;
 			},
 			handleGameRank3Selected(selectedTab) {
 				this.gameRank3selected = selectedTab;
@@ -342,23 +353,35 @@
 			},
 
 			onClickDetailItem(item) {
-				// 处理点击事件
-				console.log("QQQQ", JSON.stringify(item.link_main));
-				let url = "https://www.baidu.com/"
+				let url = item.link_main;
+				// if (!url?.trim()) {
+				// 	return;
+				// }
 				uni.navigateTo({
 					url: '/pages/news/detail?query=' + encodeURIComponent(url)
 				});
 			},
-			openExternalLink(url) {
-				// #ifdef H5
-				window.location.href = url; // 替换为你的外部链接
-				// #endif
-				// #ifdef MP-WEIXIN || MP-ALIPAY || MP-TOUTIAO || MP-QQ || APP-PLUS
+
+			onClickGearDetailItem(item) {
+				let url = item.link_main;
+				// if (!url?.trim()) {
+				// 	return;
+				// }
 				uni.navigateTo({
-					url: url // 替换为你的外部链接
+					url: '/pages/news/detail?query=' + encodeURIComponent(url)
 				});
-				// #endif
 			},
+
+			onClickTeamDetailItem(item) {
+				let url = item.link_main;
+				// if (!url?.trim()) {
+				// 	return;
+				// }
+				uni.navigateTo({
+					url: '/pages/news/detail?query=' + encodeURIComponent(url)
+				});
+			},
+
 			queryGameData() {
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.gameRank2[this.gameRank2Index];
@@ -387,6 +410,7 @@
 					}
 				});
 			},
+
 			queryGearData() {
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.gearRank2[this.gearRank2Index];
@@ -415,6 +439,7 @@
 					}
 				});
 			},
+
 			queryTeamData() {
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.teamRank2[this.teamRank2Index];
@@ -444,6 +469,7 @@
 					}
 				});
 			},
+
 			queryTeamDicList() {
 				uni.request({
 					url: 'https://www.datie123.com/entry/getRankList',
@@ -514,14 +540,16 @@
 			},
 
 			queryDicList() {
+				console.log("EEEEEE");
 				uni.request({
-					url: 'https://www.datie123.com/entry/getRankList',
+					url: 'https://datie123.com/entry/getRankList',
 					method: 'GET',
 					data: {
 						rank1: "赛事"
 					}
 				}).then((result) => {
 					// 成功处理
+					console.log("EEEEEE", result);
 					let resList = [];
 					let json = result.data;
 					if (json.code == 0) {
@@ -590,7 +618,7 @@
 			getRank3Sublist(hierarchy, rank1Key, rank2Key, rank3Key) {
 				return hierarchy[rank1Key] && hierarchy[rank1Key][rank2Key] && hierarchy[rank1Key][rank2Key][rank3Key] ||
 				[];
-			}
+			},
 		}
 	}
 </script>
@@ -614,8 +642,8 @@
 	}
 
 	.grid-item-title {
-		font-size: 14px;
-		color: black;
+		font-size: 12px;
+		color: #333333;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
