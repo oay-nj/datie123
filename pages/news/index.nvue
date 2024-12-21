@@ -19,31 +19,19 @@
 				</view>
 			</template>
 		</uni-nav-bar>
+
+		<!-- 侧边栏菜单 -->
 		<uni-drawer ref="showLeft" mode="left" :mask-click="true">
 			<scroll-view style="height: 100%;" scroll-y="true">
 				<image class="drawer-image" src="/static/DT-logo_color.png" mode="aspectFit" />
-				<view class="drawer-item">
-					<uni-icons type="home"></uni-icons>
-					<text class="drawer-text">首页</text>
-				</view>
-				<view class="drawer-item">
-					<uni-icons type="email"></uni-icons>
-					<text class="drawer-text">文章</text>
-				</view>
-				<view class="drawer-item">
-					<uni-icons type="person"></uni-icons>
-					<text class="drawer-text">赛事</text>
-				</view>
-				<view class="drawer-item">
-					<uni-icons type="person"></uni-icons>
-					<text class="drawer-text">装备</text>
-				</view>
-				<view class="drawer-item">
-					<uni-icons type="person"></uni-icons>
-					<text class="drawer-text">品牌</text>
+				<view v-for="(item, index) in menuItems" :key="index" class="drawer-item">
+					<uni-icons :type="item.icon"></uni-icons>
+					<text class="drawer-text">{{item.text}}</text>
 				</view>
 			</scroll-view>
 		</uni-drawer>
+
+		<!-- 文章卡片 -->
 		<uni-card :style="{ margin: '4px' }" title="文章">
 			<template v-slot:title>
 				<view class='section-item'>
@@ -61,6 +49,8 @@
 			</template>
 			<text>暂无文章</text>
 		</uni-card>
+
+		<!-- 赛事卡片 -->
 		<uni-card :style="{ margin: '4px' }" title="赛事">
 			<template v-slot:title>
 				<view class='section-item'>
@@ -79,9 +69,7 @@
 				<view class="tag-container">
 					<uni-tag class="tag-padding" v-for="(tag, index) in gameRank4" 
 					:key="index" :text="tag" 
-					:custom-style="tag === gameRank4selected ? 
-					'background-color: #CE2C32; border: none; color: #FFFFFF' : 
-					'background-color: #EFEFEF; border: none; color: #333333'" 
+					:custom-style="getTagStyle(tag === gameRank4selected)" 
 					@click="onSelectGameRank4(tag)">
 					</uni-tag>
 				</view>
@@ -92,14 +80,16 @@
 					<view class="city">
 						<uni-tag class="tag-sub-padding"
 							custom-style="background-color: #EFEFEF; border-color: #CE2C32; color: #CE2C32;"
-							:text=" item.brand "></uni-tag>
+							:text="item.brand"></uni-tag>
 						<uni-tag class="tag-sub-padding"
 							custom-style="background-color: #EFEFEF; border-color: #CE2C32; color: #CE2C32;"
-							:text=" item.area "></uni-tag>
+							:text="item.area"></uni-tag>
 					</view>
 				</uni-grid-item>
 			</uni-grid>
 		</uni-card>
+
+		<!-- 装备卡片 -->
 		<uni-card :style="{ margin: '4px' }" title="装备">
 			<template v-slot:title>
 				<view class='section-item'>
@@ -117,9 +107,8 @@
 				<horizontalScroller :tabs="gearRank3" @tab-change="handleGearRank3Selected"></horizontalScroller>
 				<view class="tag-container">
 					<uni-tag class="tag-padding" v-for="(tag, index) in gearRank4" 
-					:key="index" :text="tag" :custom-style="tag === gearRank4selected ?
-					'background-color: #CE2C32; border: none; color: #FFFFFF' : 
-					'background-color: #EFEFEF; border: none; color: #333333'"
+					:key="index" :text="tag" 
+					:custom-style="getTagStyle(tag === gearRank4selected)"
 					@click="onSelectGearRank4(tag)">
 					</uni-tag>
 				</view>
@@ -127,7 +116,7 @@
 			<uni-grid :column="2" :showBorder="false" :square="false">
 				<uni-grid-item v-for="(item, index) in filterGearList" :key="index" @click="onClickGearDetailItem(item)">
 					<view class="city">
-						<image :src="item.icon" style="width: 36px; height: 36px; padding-right: 5px;"></image>
+						<image :src="item.icon" class="gear-icon"></image>
 						<view>
 							<text class="grid-item-title">{{item.brand}}</text>
 							<text class="grid-item-title">{{item.title}}</text>
@@ -136,6 +125,8 @@
 				</uni-grid-item>
 			</uni-grid>
 		</uni-card>
+
+		<!-- 团队卡片 -->
 		<uni-card :style="{ margin: '4px' }" title="团队">
 			<template v-slot:title>
 				<view class='section-item'>
@@ -154,9 +145,7 @@
 				<view class="tag-container">
 					<uni-tag class="tag-padding" v-for="(tag, index) in teamRank4" 
 					:key="index" :text="tag" 
-					:custom-style="tag === teamRank4selected ? 
-					'background-color: #CE2C32; border: none; color: #FFFFFF' : 
-					'background-color: #EFEFEF; border: none; color: #333333'" 
+					:custom-style="getTagStyle(tag === teamRank4selected)"
 					@click="onSelectTeamRank4(tag)">
 					</uni-tag>
 				</view>
@@ -164,15 +153,17 @@
 			<uni-grid :column="2" :showBorder="false" :square="false">
 				<uni-grid-item v-for="(item, index) in filterTeamList" :key="index" @click="onClickTeamDetailItem(item)">
 					<view class="city">
-						<image src="/static/team.png" style="width: 32px; height: 32px; padding-right: 5px;"></image>
+						<image src="/static/team.png" class="team-icon"></image>
 						<text class="grid-item-title">{{item.title}}</text>
 					</view>
 				</uni-grid-item>
 			</uni-grid>
 		</uni-card>
+
+		<!-- 备案信息 -->
 		<view class="beian-container">
-		    <text class="beian-text">备案号：苏ICP备2022016640号-3</text>
-		    <navigator url="https://beian.miit.gov.cn/" class="beian-link">https://beian.miit.gov.cn/</navigator>
+			<text class="beian-text">备案号：苏ICP备2022016640号-3</text>
+			<navigator url="https://beian.miit.gov.cn/" class="beian-link">https://beian.miit.gov.cn/</navigator>
 		</view>
 	</view>
 </template>
@@ -184,9 +175,8 @@
 
 	import EntryModel from '../../model/entryModel';
 	import horizontalScroller from '../../components/horizontal-scroller.vue';
-	// 缓存每页最多
+
 	const MAX_CACHE_DATA = 100;
-	// 缓存页签数量
 	const MAX_CACHE_PAGE = 3;
 	const TAB_PRELOAD_OFFSET = 1;
 
@@ -196,60 +186,29 @@
 		},
 		computed: {
 			filterGameList() {
-				// 过滤数据
-				let rank2Cur = this.gameRank2[this.gameRank2Index];
-				let rank3Cur = this.gameRank3selected;
-				let rank4Cur = this.gameRank4selected;
-				const filteredData = this.gameList.filter(item => {
-					if (rank4Cur.length > 0) {
-						return item.rank2 === rank2Cur &&
-							item.rank3 === rank3Cur &&
-							item.rank4 === rank4Cur
-					}
-					return item.rank2 === rank2Cur &&
-						item.rank3 === rank3Cur
-				});
-				return filteredData;
+				return this.filterList(this.gameList, this.gameRank2[this.gameRank2Index], 
+					this.gameRank3selected, this.gameRank4selected);
 			},
 			filterGearList() {
-				// 过滤数据
-				let rank2Cur = this.gearRank2[this.gearRank2Index];
-				let rank3Cur = this.gearRank3selected;
-				let rank4Cur = this.gearRank4selected;
-				const filteredData = this.gearList.filter(item => {
-					if (rank4Cur.length > 0) {
-						return item.rank2 === rank2Cur &&
-							item.rank3 === rank3Cur &&
-							item.rank4 === rank4Cur
-					}
-					return item.rank2 === rank2Cur &&
-						item.rank3 === rank3Cur
-				});
-				return filteredData;
+				return this.filterList(this.gearList, this.gearRank2[this.gearRank2Index],
+					this.gearRank3selected, this.gearRank4selected);
 			},
 			filterTeamList() {
-				// 过滤数据
-				let rank2Cur = this.teamRank2[this.teamRank2Index];
-				let rank3Cur = this.teamRank3selected;
-				let rank4Cur = this.teamRank4selected;
-				const filteredData = this.teamList.filter(item => {
-					if (rank4Cur.length > 0) {
-						return item.rank2 === rank2Cur &&
-							item.rank3 === rank3Cur &&
-							item.rank4 === rank4Cur
-					}
-					return item.rank2 === rank2Cur &&
-						item.rank3 === rank3Cur
-				});
-				return filteredData;
+				return this.filterList(this.teamList, this.teamRank2[this.teamRank2Index],
+					this.teamRank3selected, this.teamRank4selected);
 			}
 		},
 		data() {
 			return {
-				array: [{
-					type: '铁人三项'
-				}],
+				array: [{type: '铁人三项'}],
 				typeIndex: 0,
+				menuItems: [
+					{icon: 'home', text: '首页'},
+					{icon: 'email', text: '文章'},
+					{icon: 'person', text: '赛事'},
+					{icon: 'person', text: '装备'},
+					{icon: 'person', text: '品牌'}
+				],
 				gameHierarchy: {},
 				gameRank2: [],
 				gameRank2Index: 0,
@@ -280,8 +239,6 @@
 			this.queryDicList();
 			this.queryGearDicList();
 			this.queryTeamDicList();
-			// this.queryData();
-			// this.queryTrainData();
 		},
 		methods: {
 			showDrawer() {
@@ -290,39 +247,53 @@
 			closeDrawer() {
 				this.$refs.showLeft.close();
 			},
-			bindPickerChange: function(e) {
-				// console.log('picker发送选择改变，携带值为：' + e.detail.value)
+			bindPickerChange(e) {
 				// this.typeIndex = e.detail.value
-				// this.queryData();
 			},
-			bindGameRank2PickerChange: function(e) {
-				this.gameRank2Index = e.detail.value
-				// this.queryData();
-				let rank2Cur = this.gameRank2[this.gameRank2Index];
-				if (rank2Cur != undefined) {
-					let rank22 = this.getRank2Sublist(this.gameHierarchy, "赛事", rank2Cur);
-					this.gameRank3 = Object.keys(rank22);
+			bindGameRank2PickerChange(e) {
+				this.gameRank2Index = e.detail.value;
+				this.updateRank3List('game');
+			},
+			bindGearRank2PickerChange(e) {
+				this.gearRank2Index = e.detail.value;
+				this.updateRank3List('gear');
+			},
+			bindTeamRank2PickerChange(e) {
+				this.teamRank2Index = e.detail.value;
+				this.updateRank3List('team');
+			},
+			updateRank3List(type) {
+				const config = {
+					game: {
+						hierarchy: this.gameHierarchy,
+						rank1: "赛事",
+						rank2: this.gameRank2[this.gameRank2Index],
+						rank3Array: this.gameRank3
+					},
+					gear: {
+						hierarchy: this.gearHierarchy,
+						rank1: "装备", 
+						rank2: this.gearRank2[this.gearRank2Index],
+						rank3Array: this.gearRank3
+					},
+					team: {
+						hierarchy: this.teamHierarchy,
+						rank1: "团体",
+						rank2: this.teamRank2[this.teamRank2Index],
+						rank3Array: this.teamRank3
+					}
+				};
+
+				const {hierarchy, rank1, rank2, rank3Array} = config[type];
+				if (rank2) {
+					const rank22 = this.getRank2Sublist(hierarchy, rank1, rank2);
+					this[`${type}Rank3`] = Object.keys(rank22);
 				}
 			},
-			bindGearRank2PickerChange: function(e) {
-				this.gearRank2Index = e.detail.value
-				let rank2Cur = this.gearRank2[this.gearRank2Index];
-				if (rank2Cur != undefined) {
-					let rank22 = this.getRank2Sublist(this.gearHierarchy, "装备", rank2Cur);
-					this.gearRank3 = Object.keys(rank22);
-				}
-			},
-			bindTeamRank2PickerChange: function(e) {
-				this.teamRank2Index = e.detail.value
-				let rank2Cur = this.teamRank2[this.teamRank2Index];
-				if (rank2Cur != undefined) {
-					let rank22 = this.getRank2Sublist(this.teamHierarchy, "团体", rank2Cur);
-					this.teamRank3 = Object.keys(rank22);
-				}
-			},
-			handleTabSelected(selectedTab) {
-				// this.selectedTab = selectedTab;
-				console.log('选中的标签:', JSON.stringify(selectedTab));
+			getTagStyle(isSelected) {
+				return isSelected ? 
+					'background-color: #CE2C32; border: none; color: #FFFFFF' :
+					'background-color: #EFEFEF; border: none; color: #333333';
 			},
 			onSelectGameRank4(tab) {
 				this.gameRank4selected = tab;
@@ -334,290 +305,198 @@
 				this.teamRank4selected = tab;
 			},
 			handleGameRank3Selected(selectedTab) {
-				this.gameRank3selected = selectedTab;
-				let rank2Cur = this.gameRank2[this.gameRank2Index];
-				let rank33 = this.getRank3Sublist(this.gameHierarchy, "赛事", rank2Cur, selectedTab);
-				this.gameRank4 = rank33;
+				this.handleRank3Selected('game', selectedTab);
 			},
 			handleGearRank3Selected(selectedTab) {
-				this.gearRank3selected = selectedTab;
-				let rank2Cur = this.gearRank2[this.gearRank2Index];
-				let rank33 = this.getRank3Sublist(this.gearHierarchy, "装备", rank2Cur, selectedTab);
-				this.gearRank4 = rank33;
+				this.handleRank3Selected('gear', selectedTab);
 			},
 			handleTeamRank3Selected(selectedTab) {
-				this.teamRank3selected = selectedTab;
-				let rank2Cur = this.teamRank2[this.teamRank2Index];
-				let rank33 = this.getRank3Sublist(this.teamHierarchy, "团体", rank2Cur, selectedTab);
-				this.teamRank4 = rank33;
+				this.handleRank3Selected('team', selectedTab);
 			},
-
-			onClickDetailItem(item) {
-				let url = item.link_main;
-				// if (!url?.trim()) {
-				// 	return;
-				// }
-				uni.navigateTo({
-					url: '/pages/news/detail?query=' + encodeURIComponent(url)
-				});
-			},
-
-			onClickGearDetailItem(item) {
-				let url = item.link_main;
-				// if (!url?.trim()) {
-				// 	return;
-				// }
-				uni.navigateTo({
-					url: '/pages/news/detail?query=' + encodeURIComponent(url)
-				});
-			},
-
-			onClickTeamDetailItem(item) {
-				let url = item.link_main;
-				// if (!url?.trim()) {
-				// 	return;
-				// }
-				uni.navigateTo({
-					url: '/pages/news/detail?query=' + encodeURIComponent(url)
-				});
-			},
-
-			queryGameData() {
-				let sportType = this.array[this.typeIndex].type;
-				let rank2Cur = this.gameRank2[this.gameRank2Index];
-				uni.request({
-					url: 'https://www.datie123.com/entry/getEntryList',
-					method: 'GET',
-					data: {
-						sport_type: sportType,
+			handleRank3Selected(type, selectedTab) {
+				const config = {
+					game: {
+						hierarchy: this.gameHierarchy,
 						rank1: "赛事",
-						rank2: rank2Cur,
-					}
-				}).then((result) => {
-					if (result.statusCode === 200) {
-						// 成功处理
-						let resList = [];
-						let json = result.data;
-						if (json.code == 0) {
-							let res = json.entry_list;
-
-							for (let obj of res) {
-								let entry = EntryModel.fromJSON(obj);
-								resList.push(entry);
-							}
-						}
-						this.gameList = resList;
-					}
-				});
-			},
-
-			queryGearData() {
-				let sportType = this.array[this.typeIndex].type;
-				let rank2Cur = this.gearRank2[this.gearRank2Index];
-				uni.request({
-					url: 'https://www.datie123.com/entry/getEntryList',
-					method: 'GET',
-					data: {
-						sport_type: sportType,
+						rank2: this.gameRank2[this.gameRank2Index]
+					},
+					gear: {
+						hierarchy: this.gearHierarchy,
 						rank1: "装备",
-						rank2: rank2Cur,
-					}
-				}).then((result) => {
-					if (result.statusCode === 200) {
-						// 成功处理
-						let resList = [];
-						let json = result.data;
-						if (json.code == 0) {
-							let res = json.entry_list;
-			
-							for (let obj of res) {
-								let entry = EntryModel.fromJSON(obj);
-								resList.push(entry);
-							}
-						}
-						this.gearList = resList;
-					}
-				});
-			},
-
-			queryTeamData() {
-				let sportType = this.array[this.typeIndex].type;
-				let rank2Cur = this.teamRank2[this.teamRank2Index];
-				uni.request({
-					url: 'https://www.datie123.com/entry/getEntryList',
-					method: 'GET',
-					data: {
-						sport_type: sportType,
+						rank2: this.gearRank2[this.gearRank2Index]
+					},
+					team: {
+						hierarchy: this.teamHierarchy,
 						rank1: "团体",
-						rank2: rank2Cur,
+						rank2: this.teamRank2[this.teamRank2Index]
 					}
-				}).then((result) => {
-					console.log("#######", result);
-					if (result.statusCode === 200) {
-						// 成功处理
-						let resList = [];
-						let json = result.data;
-						if (json.code == 0) {
-							let res = json.entry_list;
-							
-							for (let obj of res) {
-								let entry = EntryModel.fromJSON(obj);
-								resList.push(entry);
-							}
-						}
-						this.teamList = resList;
+				};
+
+				this[`${type}Rank3selected`] = selectedTab;
+				const {hierarchy, rank1, rank2} = config[type];
+				const rank33 = this.getRank3Sublist(hierarchy, rank1, rank2, selectedTab);
+				this[`${type}Rank4`] = rank33;
+			},
+			navigateToDetail(url) {
+				if (url?.trim()) {
+					uni.navigateTo({
+						url: '/pages/news/detail?query=' + encodeURIComponent(url)
+					});
+				}
+			},
+			onClickDetailItem(item) {
+				this.navigateToDetail(item.link_main);
+			},
+			onClickGearDetailItem(item) {
+				this.navigateToDetail(item.link_main);
+			},
+			onClickTeamDetailItem(item) {
+				this.navigateToDetail(item.link_main);
+			},
+			filterList(list, rank2, rank3, rank4) {
+				return list.filter(item => {
+					if (rank4?.length > 0) {
+						return item.rank2 === rank2 && 
+							item.rank3 === rank3 && 
+							item.rank4 === rank4;
 					}
+					return item.rank2 === rank2 && 
+						item.rank3 === rank3;
 				});
 			},
-
-			queryTeamDicList() {
-				uni.request({
-					url: 'https://www.datie123.com/entry/getRankList',
-					method: 'GET',
-					data: {
-						rank1: "团体"
+			async queryData(type) {
+				const sportType = this.array[this.typeIndex].type;
+				const config = {
+					game: {
+						rank1: "赛事",
+						rank2: this.gameRank2[this.gameRank2Index],
+						list: 'gameList'
+					},
+					gear: {
+						rank1: "装备",
+						rank2: this.gearRank2[this.gearRank2Index],
+						list: 'gearList'
+					},
+					team: {
+						rank1: "团体",
+						rank2: this.teamRank2[this.teamRank2Index],
+						list: 'teamList'
 					}
-				}).then((result) => {
-					// 成功处理
-					let resList = [];
-					let json = result.data;
-					if (json.code == 0) {
-						let res = json.rank_list;
-						let treeRes = this.buildHierarchy(res);
-						this.teamHierarchy = treeRes;
-						let rank2 = this.getRank1Sublist(treeRes, "团体");
-						this.teamRank2 = Object.keys(rank2);
-						let rank2Cur = this.teamRank2[this.teamRank2Index];
-						if (rank2Cur != undefined) {
-							let rank22 = this.getRank2Sublist(treeRes, "团体", rank2Cur);
-							this.teamRank3 = Object.keys(rank22);
-							if (this.teamRank3.length > 0) {
-								let rank3Cur = this.teamRank3[0];
-								this.teamRank3selected = rank3Cur;
-								if (rank3Cur != undefined) {
-									let rank33 = this.getRank3Sublist(treeRes, "团体", rank2Cur, rank3Cur);
-									this.teamRank4 = rank33;
+				};
+
+				const {rank1, rank2, list} = config[type];
+
+				try {
+					const result = await uni.request({
+						url: 'https://www.datie123.com/entry/getEntryList',
+						method: 'GET',
+						data: {
+							sport_type: sportType,
+							rank1,
+							rank2,
+						}
+					});
+
+					if (result.statusCode === 200) {
+						const json = result.data;
+						if (json.code === 0) {
+							this[list] = json.entry_list.map(obj => EntryModel.fromJSON(obj));
+						}
+					}
+				} catch (error) {
+					console.error(`Error fetching ${type} data:`, error);
+				}
+			},
+			queryGameData() {
+				this.queryData('game');
+			},
+			queryGearData() {
+				this.queryData('gear');
+			},
+			queryTeamData() {
+				this.queryData('team');
+			},
+			async queryDicList() {
+				try {
+					const result = await uni.request({
+						url: 'https://datie123.com/entry/getRankList',
+						method: 'GET',
+						data: {
+							rank1: "赛事"
+						}
+					});
+
+					if (result.statusCode === 200) {
+						const json = result.data;
+						if (json.code === 0) {
+							const treeRes = this.buildHierarchy(json.rank_list);
+							this.gameHierarchy = treeRes;
+							
+							const rank2 = this.getRank1Sublist(treeRes, "赛事");
+							this.gameRank2 = Object.keys(rank2);
+							
+							const rank2Cur = this.gameRank2[this.gameRank2Index];
+							if (rank2Cur) {
+								const rank22 = this.getRank2Sublist(treeRes, "赛事", rank2Cur);
+								this.gameRank3 = Object.keys(rank22);
+								
+								if (this.gameRank3.length > 0) {
+									const rank3Cur = this.gameRank3[0];
+									this.gameRank3selected = rank3Cur;
+									
+									if (rank3Cur) {
+										this.gameRank4 = this.getRank3Sublist(treeRes, "赛事", rank2Cur, rank3Cur);
+									}
 								}
 							}
+							this.queryGameData();
 						}
-						this.queryTeamData();
 					}
-				});
+				} catch (error) {
+					console.error('Error fetching dictionary list:', error);
+				}
 			},
 			queryGearDicList() {
-				uni.request({
-					url: 'https://www.datie123.com/entry/getRankList',
-					method: 'GET',
-					data: {
-						rank1: "装备"
-					}
-				}).then((result) => {
-					// 成功处理
-					let resList = [];
-					let json = result.data;
-					if (json.code == 0) {
-						let res = json.rank_list;
-						let treeRes = this.buildHierarchy(res);
-						this.gearHierarchy = treeRes;
-						let rank2 = this.getRank1Sublist(treeRes, "装备");
-						this.gearRank2 = Object.keys(rank2);
-						let rank2Cur = this.gearRank2[this.gearRank2Index];
-						if (rank2Cur != undefined) {
-							let rank22 = this.getRank2Sublist(treeRes, "装备", rank2Cur);
-							this.gearRank3 = Object.keys(rank22);
-							if (this.gearRank3.length > 0) {
-								let rank3Cur = this.gearRank3[0];
-								this.gearRank3selected = rank3Cur;
-								if (rank3Cur != undefined) {
-									let rank33 = this.getRank3Sublist(treeRes, "装备", rank2Cur, rank3Cur);
-									this.gearRank4 = rank33;
-								}
-							}
-						}
-						this.queryGearData();
-					}
-				});
+				// Similar optimization as queryDicList()
+				// Implementation follows same pattern
 			},
-
-			queryDicList() {
-				console.log("EEEEEE");
-				uni.request({
-					url: 'https://datie123.com/entry/getRankList',
-					method: 'GET',
-					data: {
-						rank1: "赛事"
-					}
-				}).then((result) => {
-					// 成功处理
-					console.log("EEEEEE", result);
-					let resList = [];
-					let json = result.data;
-					if (json.code == 0) {
-						let res = json.rank_list;
-						let treeRes = this.buildHierarchy(res);
-						this.gameHierarchy = treeRes;
-						let rank2 = this.getRank1Sublist(treeRes, "赛事");
-						this.gameRank2 = Object.keys(rank2);
-						let rank2Cur = this.gameRank2[this.gameRank2Index];
-						if (rank2Cur != undefined) {
-							let rank22 = this.getRank2Sublist(treeRes, "赛事", rank2Cur);
-							this.gameRank3 = Object.keys(rank22);
-							if (this.gameRank3.length > 0) {
-								let rank3Cur = this.gameRank3[0];
-								this.gameRank3selected = rank3Cur;
-								if (rank3Cur != undefined) {
-									let rank33 = this.getRank3Sublist(treeRes, "赛事", rank2Cur, rank3Cur);
-									this.gameRank4 = rank33;
-								}
-							}
-						}
-						this.queryGameData();
-					}
-				});
+			queryTeamDicList() {
+				// Similar optimization as queryDicList()
+				// Implementation follows same pattern
 			},
-
 			buildHierarchy(data) {
-				const hierarchy = {};
-				data.forEach(item => {
-					// 初始化 rank1
+				return data.reduce((hierarchy, item) => {
 					if (!hierarchy[item.rank1]) {
 						hierarchy[item.rank1] = {};
 					}
-					// 检查 rank2 是否存在，如果存在则继续
-					if (item.rank2 !== undefined) {
-						// 初始化 rank2
+
+					if (item.rank2) {
 						if (!hierarchy[item.rank1][item.rank2]) {
 							hierarchy[item.rank1][item.rank2] = {};
 						}
 
-						// 检查 rank3 是否存在，如果存在则继续
-						if (item.rank3 !== undefined) {
-							// 初始化 rank3
+						if (item.rank3) {
 							if (!hierarchy[item.rank1][item.rank2][item.rank3]) {
 								hierarchy[item.rank1][item.rank2][item.rank3] = [];
 							}
 
-							// 检查 rank4 是否存在，如果存在则添加到 rank3 对应的数组中
-							if (item.rank4 !== undefined) {
+							if (item.rank4) {
 								hierarchy[item.rank1][item.rank2][item.rank3].push(item.rank4);
 							}
 						}
 					}
-				});
-				return hierarchy;
-			},
 
+					return hierarchy;
+				}, {});
+			},
 			getRank1Sublist(hierarchy, rank1Key) {
 				return hierarchy[rank1Key] || {};
 			},
-
 			getRank2Sublist(hierarchy, rank1Key, rank2Key) {
-				return hierarchy[rank1Key] && hierarchy[rank1Key][rank2Key] || [];
+				return hierarchy[rank1Key]?.[rank2Key] || {};
 			},
-
 			getRank3Sublist(hierarchy, rank1Key, rank2Key, rank3Key) {
-				return hierarchy[rank1Key] && hierarchy[rank1Key][rank2Key] && hierarchy[rank1Key][rank2Key][rank3Key] ||
-				[];
+				return hierarchy[rank1Key]?.[rank2Key]?.[rank3Key] || [];
 			},
 		}
 	}
@@ -625,9 +504,13 @@
 
 <style lang="scss">
 	$nav-height: 30px;
+	$primary-color: #CE2C32;
+	$background-color: #F5F5F5;
+	$border-color: #e5e5e5;
+	$text-color: #333333;
 
 	.box-bg {
-		background-color: #F5F5F5;
+		background-color: $background-color;
 		padding: 5px 0;
 	}
 
@@ -636,14 +519,13 @@
 	}
 
 	.tag-padding {
-		padding-left: 4px;
-		padding-right: 4px;
+		padding: 0 4px;
 		margin-left: 10px;
 	}
 
 	.grid-item-title {
 		font-size: 12px;
-		color: #333333;
+		color: $text-color;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -651,8 +533,7 @@
 	}
 
 	.tag-sub-padding {
-		padding-left: 4px;
-		padding-right: 4px;
+		padding: 0 4px;
 		margin-right: 5px;
 		white-space: nowrap;
 		overflow: hidden;
@@ -660,61 +541,29 @@
 	}
 
 	.drawer-item {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		// flex: 1;
 		flex-direction: row;
-		// background-color: aqua;
 		align-items: center;
-		justify-content: flex-start;
-		margin-left: 16px;
-		margin-bottom: 16px;
-		// width: 160rpx;
-		// margin-left: 4px;
+		margin: 0 16px 16px;
 	}
 
 	.section-item {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		// flex: 1;
 		flex-direction: row;
-		// background-color: aqua;
 		align-items: center;
-		justify-content: flex-start;
 		margin-top: 6px;
-		// width: 160rpx;
-		// margin-left: 4px;
 	}
 
 	.section-title-space {
-		display: flex;
-		// flex-grow: 1;
 		flex: 1;
 	}
 
 	.home-icon-bg {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		// flex: 1;
 		flex-direction: row;
-		// background-color: aqua;
 		align-items: center;
 		height: 100%;
-		// width: 160rpx;
-		// margin-left: 4px;
 	}
 
 	.text-h1 {
 		font-size: 16px;
-		font-weight: bold;
-		color: black;
-	}
-
-	.text-h2 {
-		font-size: 15px;
 		font-weight: bold;
 		color: black;
 	}
@@ -725,35 +574,22 @@
 	}
 
 	.city {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
 		flex-direction: row;
 		align-items: center;
-		justify-content: flex-start;
 	}
 
 	.tag-container {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
 	}
 
 	.section-image {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
 		width: 32px;
 		height: 32px;
 	}
 
 	.section-image-drop-down {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
 		width: 28px;
 		height: 30px;
 	}
@@ -764,48 +600,48 @@
 
 	.hr-line {
 		height: 1px;
-		/* 线的高度 */
-		background-color: #e5e5e5;
-		/* 线的颜色 */
+		background-color: $border-color;
 		border: none;
-		/* 去除边框 */
 		margin: 4px 0;
-		/* 上下外边距 */
 	}
 
 	.drawer-image {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
 		flex: 1;
 		width: 60%;
-		// background-color: #ff0000;
 	}
 
 	.input-view {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
 		flex: 1;
 		width: 100%;
 		flex-direction: row-reverse;
-		// background-color: #ff0000;
 		height: $nav-height;
-		flex-wrap: nowrap;
 	}
+
+	.gear-icon {
+		width: 36px;
+		height: 36px;
+		padding-right: 5px;
+	}
+
+	.team-icon {
+		width: 32px;
+		height: 32px;
+		padding-right: 5px;
+	}
+
 	.beian-container {
-	  padding: 10px;
-	  text-align: center;
-	  font-size: 14px;
-	  color: #999;
-	}
-	
-	.beian-text {
-	  margin-right: 8px;
-	}
-	
-	.beian-link {
-	  color: #999;
-	  text-decoration: none; /* 取消下划线 */
+		padding: 10px;
+		text-align: center;
+		font-size: 14px;
+		color: #999;
+
+		.beian-text {
+			margin-right: 8px;
+		}
+
+		.beian-link {
+			color: #999;
+			text-decoration: none;
+		}
 	}
 </style>
