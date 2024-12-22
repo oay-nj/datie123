@@ -77,7 +77,7 @@
 					<uni-tag class="tag-padding" v-for="(tag, index) in gameRank4" 
 					:key="index" :text="tag" 
 					:custom-style="tag === gameRank4selected ? 
-					'background-color: #CE2C32; border: none; color: #FFFFFF' : 
+					'background-color: #FBE7E9; border: none; color: #CE2C32' : 
 					'background-color: #EFEFEF; border: none; color: #333333'" 
 					@click="onSelectGameRank4(tag)">
 					</uni-tag>
@@ -115,7 +115,7 @@
 				<view class="tag-container">
 					<uni-tag class="tag-padding" v-for="(tag, index) in gearRank4" 
 					:key="index" :text="tag" :custom-style="tag === gearRank4selected ?
-					'background-color: #CE2C32; border: none; color: #FFFFFF' : 
+					'background-color: #FBE7E9; border: none; color: #CE2C32' : 
 					'background-color: #EFEFEF; border: none; color: #333333'"
 					@click="onSelectGearRank4(tag)">
 					</uni-tag>
@@ -152,7 +152,7 @@
 					<uni-tag class="tag-padding" v-for="(tag, index) in teamRank4" 
 					:key="index" :text="tag" 
 					:custom-style="tag === teamRank4selected ? 
-					'background-color: #CE2C32; border: none; color: #FFFFFF' : 
+					'background-color: #FBE7E9; border: none; color: #CE2C32' : 
 					'background-color: #EFEFEF; border: none; color: #333333'" 
 					@click="onSelectTeamRank4(tag)">
 					</uni-tag>
