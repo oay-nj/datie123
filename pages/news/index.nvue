@@ -124,10 +124,10 @@
 			<uni-grid :column="2" :showBorder="false" :square="false">
 				<uni-grid-item v-for="(item, index) in filterGearList" :key="index" @click="onClickGearDetailItem(item)">
 					<view class="city">
-						<image :src="item.icon" style="width: 36px; height: 36px; padding-right: 5px;"></image>
-						<view>
-							<text class="grid-item-title">{{item.brand}}</text>
-							<text class="grid-item-title">{{item.title}}</text>
+						<image :src="item.icon" style="width: 36px; height: 36px; padding-right: 5px; flex-shrink: 0;"></image>
+						<view style="flex: 1; overflow: hidden;">
+							<text class="grid-item-title" >{{item.brand}}</text>
+							<text class="grid-item-title" >{{item.title}}</text>
 						</view>
 					</view>
 				</uni-grid-item>
