@@ -171,8 +171,7 @@
 			</uni-grid>
 		</uni-card>
 		<view class="beian-container">
-		    <text class="beian-text">备案号：苏ICP备2022016640号-3</text>
-		    <navigator url="https://beian.miit.gov.cn/" class="beian-link">https://beian.miit.gov.cn/</navigator>
+		    <text class="beian-text" @click="openBeianLink">备案号：苏ICP备2022016640号-3</text>
 		</view>
 	</view>
 </template>
@@ -619,6 +618,16 @@
 				return hierarchy[rank1Key] && hierarchy[rank1Key][rank2Key] && hierarchy[rank1Key][rank2Key][rank3Key] ||
 				[];
 			},
+
+			openBeianLink() {
+				// #ifdef APP-PLUS
+				plus.runtime.openURL('https://beian.miit.gov.cn/');
+				// #endif
+				
+				// #ifdef H5
+				window.open('https://beian.miit.gov.cn/', '_blank');
+				// #endif
+			}
 		}
 	}
 </script>
