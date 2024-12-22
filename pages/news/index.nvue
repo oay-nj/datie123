@@ -295,12 +295,13 @@
 			},
 			bindGameRank2PickerChange: function(e) {
 				this.gameRank2Index = e.detail.value
-				// this.queryData();
 				let rank2Cur = this.gameRank2[this.gameRank2Index];
 				if (rank2Cur != undefined) {
 					let rank22 = this.getRank2Sublist(this.gameHierarchy, "赛事", rank2Cur);
 					this.gameRank3 = Object.keys(rank22);
+					this.gameRank3selected = this.gameRank3[0] || '';
 				}
+				this.queryGameData();
 			},
 			bindGearRank2PickerChange: function(e) {
 				this.gearRank2Index = e.detail.value
@@ -308,7 +309,9 @@
 				if (rank2Cur != undefined) {
 					let rank22 = this.getRank2Sublist(this.gearHierarchy, "装备", rank2Cur);
 					this.gearRank3 = Object.keys(rank22);
+					this.gearRank3selected = this.gearRank3[0] || '';
 				}
+				this.queryGearData();
 			},
 			bindTeamRank2PickerChange: function(e) {
 				this.teamRank2Index = e.detail.value
@@ -316,7 +319,9 @@
 				if (rank2Cur != undefined) {
 					let rank22 = this.getRank2Sublist(this.teamHierarchy, "团体", rank2Cur);
 					this.teamRank3 = Object.keys(rank22);
+					this.teamRank3selected = this.teamRank3[0] || '';
 				}
+				this.queryTeamData();
 			},
 			handleTabSelected(selectedTab) {
 				// this.selectedTab = selectedTab;
@@ -467,6 +472,12 @@
 			},
 
 			queryGearData() {
+				// Show loading indicator
+				uni.showLoading({
+					title: '加载中...',
+					mask: true
+				});
+
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.gearRank2[this.gearRank2Index];
 				
@@ -497,7 +508,7 @@
 								resList.push(entry);
 							}
 
-							// If we have results and haven't reached 40 items yet, fetch the second page
+							// If we have results and haven't reached 240 items yet, fetch the second page
 							if (resList.length > 0 && resList.length < 240) {
 								const lastEntryId = resList[resList.length - 1].entry_id;
 								
@@ -512,16 +523,31 @@
 												resList.push(entry);
 											}
 										}
-										// Update the gearList with all items (up to 40)
 										this.gearList = resList.slice(0, 240);
 									}
+									// Hide loading indicator after second request completes
+									uni.hideLoading();
+								}).catch(() => {
+									// Hide loading on error
+									uni.hideLoading();
 								});
 							} else {
-								// If we have less than 20 items or exactly 20 items, use just the first page
+								// If we have less than first page items, use just the first page
 								this.gearList = resList;
+								// Hide loading indicator after first request completes
+								uni.hideLoading();
 							}
+						} else {
+							// Hide loading if the response code is not 0
+							uni.hideLoading();
 						}
+					} else {
+						// Hide loading if the status code is not 200
+						uni.hideLoading();
 					}
+				}).catch(() => {
+					// Hide loading on error
+					uni.hideLoading();
 				});
 			},
 
