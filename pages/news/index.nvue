@@ -40,7 +40,7 @@
 				</view>
 				<view class="drawer-item">
 					<uni-icons type="person"></uni-icons>
-					<text class="drawer-text">品牌</text>
+					<text class="drawer-text">团队</text>
 				</view>
 			</scroll-view>
 		</uni-drawer>
@@ -50,16 +50,15 @@
 					<image class="section-image" src="/static/资讯.svg" mode="aspectFit" />
 					<text class="text-h1">文章</text>
 					<view class="section-title-space"></view>
-					<picker @change="bindPickerChange" :value="typeIndex" :range="array" range-key="type">
-						<view class="city">
-							<view class="text-h1">优质文章</view>
-							<image class="section-image-drop-down" src="/static/frop-down.svg" mode="aspectFit" />
-						</view>
-					</picker>
+					<view class="text-h1">优质文章</view>
 				</view>
 				<view class="hr-line"></view>
 			</template>
-			<text>暂无文章</text>
+			<uni-grid :column="2" :showBorder="false" :square="false">
+				<uni-grid-item v-for="(item, index) in articleList" :key="index" @click="onClickDetailItem(item)">
+					<text class="grid-item-title">{{item.title}}</text>
+				</uni-grid-item>
+			</uni-grid>
 		</uni-card>
 		<uni-card :style="{ margin: '4px' }" title="赛事">
 			<template v-slot:title>
@@ -249,6 +248,7 @@
 					type: '铁人三项'
 				}],
 				typeIndex: 0,
+				articleList: [],
 				gameHierarchy: {},
 				gameRank2: [],
 				gameRank2Index: 0,
@@ -279,6 +279,7 @@
 			this.queryDicList();
 			this.queryGearDicList();
 			this.queryTeamDicList();
+			this.queryArticleList();
 			// this.queryData();
 			// this.queryTrainData();
 		},
@@ -378,6 +379,33 @@
 				// }
 				uni.navigateTo({
 					url: '/pages/news/detail?query=' + encodeURIComponent(url)
+				});
+			},
+
+			queryArticleList() {
+				let sportType = "跑步";
+				uni.request({
+					url: 'https://datie123.com/entry/getEntryList',
+					method: 'GET',
+					data: {
+						sport_type: sportType,
+						rank1: "文章",
+					}
+				}).then((result) => {
+					console.log("####", result);
+					if (result.statusCode === 200) {
+						// 成功处理
+						let resList = [];
+						let json = result.data;
+						if (json.code == 0) {
+							let res = json.entry_list;
+							for (let obj of res) {
+								let entry = EntryModel.fromJSON(obj);
+								resList.push(entry);
+							}
+						}
+						this.articleList = resList;
+					}
 				});
 			},
 
@@ -539,7 +567,6 @@
 			},
 
 			queryDicList() {
-				console.log("EEEEEE");
 				uni.request({
 					url: 'https://datie123.com/entry/getRankList',
 					method: 'GET',
