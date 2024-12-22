@@ -1,6 +1,6 @@
 <template>
 	<view class="box-bg">
-		<uni-nav-bar>
+		<uni-nav-bar ref="navBar">
 			<template v-slot:left>
 				<view class="city" @click="showDrawer">
 					<image class="navi-left-image" src="/static/meun.svg" mode="aspectFit" />
@@ -24,7 +24,7 @@
 		<uni-drawer ref="showLeft" mode="left" :mask-click="true">
 			<scroll-view style="height: 100%;" scroll-y="true">
 				<image class="drawer-image" src="/static/DT-logo_color.png" mode="aspectFit" />
-				<view v-for="(item, index) in menuItems" :key="index" class="drawer-item">
+				<view v-for="(item, index) in menuItems" :key="index" class="drawer-item" @click="scrollToSection(item.section)">
 					<uni-icons :type="item.icon"></uni-icons>
 					<text class="drawer-text">{{item.text}}</text>
 				</view>
@@ -32,26 +32,30 @@
 		</uni-drawer>
 
 		<!-- 文章卡片 -->
-		<uni-card :style="{ margin: '4px' }" title="文章">
+		<uni-card ref="article" :style="{ margin: '4px' }" title="文章">
 			<template v-slot:title>
 				<view class='section-item'>
 					<image class="section-image" src="/static/资讯.svg" mode="aspectFit" />
 					<text class="text-h1">文章</text>
 					<view class="section-title-space"></view>
-					<picker @change="bindPickerChange" :value="typeIndex" :range="array" range-key="type">
+					<picker @change="bindArticleRank3PickerChange" :value="articleRank3Index" :range="articleRank3">
 						<view class="city">
-							<view class="text-h1">优质文章</view>
+							<view class="text-h1">{{articleRank3[articleRank3Index]}}</view>
 							<image class="section-image-drop-down" src="/static/frop-down.svg" mode="aspectFit" />
 						</view>
 					</picker>
 				</view>
 				<view class="hr-line"></view>
 			</template>
-			<text>暂无文章</text>
+			<uni-grid :column="2" :showBorder="false" :square="false">
+				<uni-grid-item v-for="(item, index) in filterArticleList" :key="index" @click="onClickArticleDetailItem(item)">
+					<text class="grid-item-title">{{item.title}}</text>
+				</uni-grid-item>
+			</uni-grid>
 		</uni-card>
 
 		<!-- 赛事卡片 -->
-		<uni-card :style="{ margin: '4px' }" title="赛事">
+		<uni-card ref="game" :style="{ margin: '4px' }" title="赛事">
 			<template v-slot:title>
 				<view class='section-item'>
 					<image class="section-image" src="/static/比赛.svg" mode="aspectFit" />
@@ -90,7 +94,7 @@
 		</uni-card>
 
 		<!-- 装备卡片 -->
-		<uni-card :style="{ margin: '4px' }" title="装备">
+		<uni-card ref="gear" :style="{ margin: '4px' }" title="装备">
 			<template v-slot:title>
 				<view class='section-item'>
 					<image class="section-image" src="/static/装备.svg" mode="aspectFit" />
@@ -127,7 +131,7 @@
 		</uni-card>
 
 		<!-- 团队卡片 -->
-		<uni-card :style="{ margin: '4px' }" title="团队">
+		<uni-card ref="team" :style="{ margin: '4px' }" title="团队">
 			<template v-slot:title>
 				<view class='section-item'>
 					<image class="section-image" src="/static/团队.svg" mode="aspectFit" />
@@ -185,6 +189,10 @@
 			horizontalScroller,
 		},
 		computed: {
+			filterArticleList() {
+				return this.filterList(this.articleList, this.articleRank2[this.articleRank2Index], 
+					this.articleRank3selected, this.articleRank4selected);
+			},
 			filterGameList() {
 				return this.filterList(this.gameList, this.gameRank2[this.gameRank2Index], 
 					this.gameRank3selected, this.gameRank4selected);
@@ -203,12 +211,20 @@
 				array: [{type: '铁人三项'}],
 				typeIndex: 0,
 				menuItems: [
-					{icon: 'home', text: '首页'},
-					{icon: 'email', text: '文章'},
-					{icon: 'person', text: '赛事'},
-					{icon: 'person', text: '装备'},
-					{icon: 'person', text: '品牌'}
+					{icon: 'home', text: '首页', section: 'home'},
+					{icon: 'email', text: '文章', section: 'article'},
+					{icon: 'person', text: '赛事', section: 'game'},
+					{icon: 'person', text: '装备', section: 'gear'},
+					{icon: 'person', text: '团队', section: 'team'}
 				],
+				articleHierarchy: {},
+				articleRank2: [""],
+				articleRank2Index: 0,
+				articleRank3: [],
+				articleRank3selected: '',
+				articleRank4: [],
+				articleRank4selected: '',
+				articleList: [],
 				gameHierarchy: {},
 				gameRank2: [],
 				gameRank2Index: 0,
@@ -236,7 +252,8 @@
 			}
 		},
 		onReady() {
-			this.queryDicList();
+			this.queryArticleDicList();
+			this.queryGameDicList();
 			this.queryGearDicList();
 			this.queryTeamDicList();
 		},
@@ -344,6 +361,9 @@
 					});
 				}
 			},
+			onClickArticleDetailItem(item) {
+				this.navigateToDetail(item.link_main);
+			},
 			onClickDetailItem(item) {
 				this.navigateToDetail(item.link_main);
 			},
@@ -416,7 +436,39 @@
 			queryTeamData() {
 				this.queryData('team');
 			},
-			async queryDicList() {
+			async queryArticleDicList() {
+				try {
+					const result = await uni.request({
+						url: 'https://datie123.com/entry/getRankList',
+						method: 'GET',
+						data: {
+							rank1: "文章"
+						}
+					});
+					if (result.statusCode === 200) {
+						const json = result.data;
+						if (json.code === 0) {
+							const treeRes = this.buildHierarchy(json.rank_list);
+							this.articleHierarchy = treeRes;
+							
+							const rank2 = this.getRank1Sublist(treeRes, "文章");
+							this.articleRank2 = Object.keys(rank2);
+							this.articleRank2Index = 0;
+
+							const rank2Cur = this.articleRank2[this.articleRank2Index];
+							if (rank2Cur) {
+								const rank22 = this.getRank2Sublist(treeRes, "文章", rank2Cur);
+								this.articleRank3 = Object.keys(rank22);
+								this.articleRank3selected = this.articleRank3[0];
+							}
+							this.queryArticleData();
+						}
+					}
+				} catch (error) {
+					console.error('Error fetching dictionary list:', error);
+				}
+			},
+			async queryGameDicList() {
 				try {
 					const result = await uni.request({
 						url: 'https://datie123.com/entry/getRankList',
@@ -497,6 +549,21 @@
 			},
 			getRank3Sublist(hierarchy, rank1Key, rank2Key, rank3Key) {
 				return hierarchy[rank1Key]?.[rank2Key]?.[rank3Key] || [];
+			},
+			scrollToSection(section) {
+				// Close drawer first
+				this.closeDrawer();
+				
+				// Use dom.scrollToElement to scroll to the target section
+				// #ifdef APP-PLUS
+				const el = this.$refs[section];
+				if (el) {
+					dom.scrollToElement(el, {
+						offset: -85, // Adjust offset as needed to account for header
+						animated: true
+					});
+				}
+				// #endif
 			},
 		}
 	}
