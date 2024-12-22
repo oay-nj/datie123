@@ -388,9 +388,9 @@
 					data: {
 						sport_type: sportType,
 						rank1: "文章",
+						order_type: '1',
 					}
 				}).then((result) => {
-					console.log("####", result);
 					if (result.statusCode === 200) {
 						// 成功处理
 						let resList = [];
@@ -410,28 +410,58 @@
 			queryGameData() {
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.gameRank2[this.gameRank2Index];
-				uni.request({
-					url: 'https://datie123.com/entry/getEntryList',
-					method: 'GET',
-					data: {
-						sport_type: sportType,
-						rank1: "赛事",
-						rank2: rank2Cur,
-					}
-				}).then((result) => {
+				
+				// Helper function to make the request
+				const fetchPage = (lastEntryId = '') => {
+					return uni.request({
+						url: 'https://datie123.com/entry/getEntryList',
+						method: 'GET',
+						data: {
+							sport_type: sportType,
+							rank1: "赛事",
+							rank2: rank2Cur,
+							order_type: '1',
+							entry_id: lastEntryId // Add entry_id parameter for pagination
+						}
+					});
+				};
+
+				// First page request
+				fetchPage().then((result) => {
 					if (result.statusCode === 200) {
-						// 成功处理
 						let resList = [];
 						let json = result.data;
 						if (json.code == 0) {
 							let res = json.entry_list;
-
 							for (let obj of res) {
 								let entry = EntryModel.fromJSON(obj);
 								resList.push(entry);
 							}
+
+							// If we have results and haven't reached 40 items yet, fetch the second page
+							if (resList.length > 0 && resList.length < 160) {
+								const lastEntryId = resList[resList.length - 1].entry_id;
+								
+								// Second page request
+								fetchPage(lastEntryId).then((secondResult) => {
+									if (secondResult.statusCode === 200) {
+										let secondJson = secondResult.data;
+										if (secondJson.code == 0) {
+											let secondRes = secondJson.entry_list;
+											for (let obj of secondRes) {
+												let entry = EntryModel.fromJSON(obj);
+												resList.push(entry);
+											}
+										}
+										// Update the gameList with all items (up to 40)
+										this.gameList = resList.slice(0, 160);
+									}
+								});
+							} else {
+								// If we have less than 20 items or exactly 20 items, use just the first page
+								this.gameList = resList;
+							}
 						}
-						this.gameList = resList;
 					}
 				});
 			},
@@ -439,28 +469,58 @@
 			queryGearData() {
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.gearRank2[this.gearRank2Index];
-				uni.request({
-					url: 'https://datie123.com/entry/getEntryList',
-					method: 'GET',
-					data: {
-						sport_type: sportType,
-						rank1: "装备",
-						rank2: rank2Cur,
-					}
-				}).then((result) => {
+				
+				// Helper function to make the request
+				const fetchPage = (lastEntryId = '') => {
+					return uni.request({
+						url: 'https://datie123.com/entry/getEntryList',
+						method: 'GET',
+						data: {
+							sport_type: sportType,
+							rank1: "装备",
+							rank2: rank2Cur,
+							order_type: '1',
+							entry_id: lastEntryId
+						}
+					});
+				};
+
+				// First page request
+				fetchPage().then((result) => {
 					if (result.statusCode === 200) {
-						// 成功处理
 						let resList = [];
 						let json = result.data;
 						if (json.code == 0) {
 							let res = json.entry_list;
-			
 							for (let obj of res) {
 								let entry = EntryModel.fromJSON(obj);
 								resList.push(entry);
 							}
+
+							// If we have results and haven't reached 40 items yet, fetch the second page
+							if (resList.length > 0 && resList.length < 240) {
+								const lastEntryId = resList[resList.length - 1].entry_id;
+								
+								// Second page request
+								fetchPage(lastEntryId).then((secondResult) => {
+									if (secondResult.statusCode === 200) {
+										let secondJson = secondResult.data;
+										if (secondJson.code == 0) {
+											let secondRes = secondJson.entry_list;
+											for (let obj of secondRes) {
+												let entry = EntryModel.fromJSON(obj);
+												resList.push(entry);
+											}
+										}
+										// Update the gearList with all items (up to 40)
+										this.gearList = resList.slice(0, 240);
+									}
+								});
+							} else {
+								// If we have less than 20 items or exactly 20 items, use just the first page
+								this.gearList = resList;
+							}
 						}
-						this.gearList = resList;
 					}
 				});
 			},
@@ -468,29 +528,58 @@
 			queryTeamData() {
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.teamRank2[this.teamRank2Index];
-				uni.request({
-					url: 'https://datie123.com/entry/getEntryList',
-					method: 'GET',
-					data: {
-						sport_type: sportType,
-						rank1: "团体",
-						rank2: rank2Cur,
-					}
-				}).then((result) => {
-					console.log("#######", result);
+				
+				// Helper function to make the request
+				const fetchPage = (lastEntryId = '') => {
+					return uni.request({
+						url: 'https://datie123.com/entry/getEntryList',
+						method: 'GET',
+						data: {
+							sport_type: sportType,
+							rank1: "团体",
+							rank2: rank2Cur,
+							order_type: '1',
+							entry_id: lastEntryId
+						}
+					});
+				};
+
+				// First page request
+				fetchPage().then((result) => {
 					if (result.statusCode === 200) {
-						// 成功处理
 						let resList = [];
 						let json = result.data;
 						if (json.code == 0) {
 							let res = json.entry_list;
-							
 							for (let obj of res) {
 								let entry = EntryModel.fromJSON(obj);
 								resList.push(entry);
 							}
+
+							// If we have results and haven't reached 40 items yet, fetch the second page
+							if (resList.length > 0 && resList.length < 200) {
+								const lastEntryId = resList[resList.length - 1].entry_id;
+								
+								// Second page request
+								fetchPage(lastEntryId).then((secondResult) => {
+									if (secondResult.statusCode === 200) {
+										let secondJson = secondResult.data;
+										if (secondJson.code == 0) {
+											let secondRes = secondJson.entry_list;
+											for (let obj of secondRes) {
+												let entry = EntryModel.fromJSON(obj);
+												resList.push(entry);
+											}
+										}
+										// Update the teamList with all items (up to 40)
+										this.teamList = resList.slice(0, 200);
+									}
+								});
+							} else {
+								// If we have less than 20 items or exactly 20 items, use just the first page
+								this.teamList = resList;
+							}
 						}
-						this.teamList = resList;
 					}
 				});
 			},
@@ -826,7 +915,7 @@
 
 	.hr-line {
 		height: 1px;
-		/* 线的高度 */
+		/* 线的高 */
 		background-color: #e5e5e5;
 		/* 线的颜色 */
 		border: none;
