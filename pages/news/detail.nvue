@@ -1,72 +1,155 @@
 <template>
 	<view class="box-bg">
-		<view class="custom-navigation">
-		    <!-- 自定义导航栏内容 -->
-		    <view class="nav-back" @click="navigateBack">返回</view>
-		    <view class="nav-title">{{ title }}</view>
-		  </view>
-		<web-view class="webview-box" :src="url"></web-view>
+		<view class="custom-navigation" :style="{ top: statusBarHeight + 'px' }">
+			<view class="nav-back" @click="navigateBack">
+				<view style="flex-direction: row; align-items: center;">
+					<uni-icons type="back" size="24" color="#000000"></uni-icons>
+					<text class="back-text">返回</text>
+				</view>
+			</view>
+			<view class="nav-title">
+				<text class="title-text">{{pageTitle}}</text>
+			</view>
+		</view>
+		<view class="content" :style="{ paddingTop: (statusBarHeight + 44) + 'px' }">
+			<web-view 
+				class="webview-box" 
+				:src="url" 
+				@onPostMessage="handlePostMessage"
+			></web-view>
+		</view>
 	</view>
 </template>
 
 <script>
-
-  export default {
-    data() {
-      return {
-        url: '',
-		pageTitle: '' // 网页标题
-      }
-    },
-    onLoad(event) {
-      // 目前在某些平台参数会被主动 decode，暂时这样处理。
-      this.load(event.query);
-    },
-    methods: {
-      load(e) {
-        var p = decodeURIComponent(e);
-		this.url = p;
-      },
-	  navigateBack() {
-	        // 实现返回逻辑
-	        uni.navigateBack();
-	      }
-    }
-  }
+export default {
+	data() {
+		return {
+			url: 'about:blank',
+			pageTitle: '',
+			statusBarHeight: 20
+		}
+	},
+	onLoad(event) {
+		// 获取状态栏高度
+		this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+		
+		// 检查和处理 URL
+		if(event.query	) {
+			try {
+				this.url = decodeURIComponent(event.query);
+				console.log('Loading URL:', this.url);
+				
+				if (!this.url.startsWith('http://') && !this.url.startsWith('https://')) {
+					this.url = 'https://' + this.url;
+				}
+			} catch (e) {
+				console.error('URL decode error:', e);
+				uni.showToast({
+					title: 'URL格式错误',
+					icon: 'none'
+				});
+			}
+		} else {
+			console.error('No URL provided');
+			uni.showToast({
+				title: '未提供URL',
+				icon: 'none'
+			});
+		}
+		
+		if(event.title) {
+			this.pageTitle = decodeURIComponent(event.title);
+		}
+	},
+	methods: {
+		navigateBack() {
+			uni.navigateBack();
+		},
+		handlePostMessage(event) {
+			console.log('PostMessage received:', event.detail);
+			if(event.detail.data && event.detail.data.title) {
+				// 如果从postMessage获取到标题就使用,否则尝试从网页标题获取
+				if (event.detail.data.title) {
+					this.pageTitle = event.detail.data.title;
+				} else {
+					// 通过webview获取网页标题
+					const webview = this.$refs.webview;
+					if (webview) {
+						webview.evaluate('document.title', (result) => {
+							if (result) {
+								this.pageTitle = result;
+							}
+						});
+					}
+				}
+			}
+		}
+	}
+}
 </script>
 
 <style>
-  .box-bg {
-	  height: 100vh;
-  	background-color: #F5F5F5;
-  	display: flex;
-  }
-  
-  .webview-box {
+.box-bg {
 	flex: 1;
-  }
-  
-  .custom-navigation {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 44px; /* 导航栏高度 */
-    display: flex;
-    align-items: center;
-    background-color: #fff;
-    padding: 0 10px;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
-  }
-  .nav-back {
-    font-size: 18px;
-    color: #333;
-  }
-  .nav-title {
-    flex: 1;
-    text-align: center;
-    font-size: 18px;
-    color: #333;
-  }
+	position: relative;
+	width: 750rpx;
+	height: 100vh;
+	background-color: #ffffff;
+}
 
+.content {
+	flex: 1;
+	width: 750rpx;
+	height: 100vh;
+	background-color: #ffffff;
+}
+
+.webview-box {
+	flex: 1;
+	width: 750rpx;
+	height: calc(100vh - 44px - var(--status-bar-height));
+}
+
+.custom-navigation {
+	position: fixed;
+	left: 0;
+	right: 0;
+	height: 44px;
+	z-index: 999;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	background-color: #ffffff;
+	padding: 0 15px;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.nav-back {
+	display: flex;
+	align-items: center;
+	padding: 8px;
+}
+
+.back-icon {
+	width: 20px;
+	height: 20px;
+}
+
+.back-text {
+	font-size: 16px;
+	color: #333;
+	margin-left: 4px;
+}
+
+.nav-title {
+	flex: 1;
+	text-align: center;
+}
+
+.title-text {
+	font-size: 18px;
+	color: #333;
+	font-weight: 500;
+}
 </style>

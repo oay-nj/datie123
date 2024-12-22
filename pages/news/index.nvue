@@ -381,7 +381,7 @@
 			},
 
 			queryArticleList() {
-				let sportType = "跑步";
+				let sportType = "铁人三项";
 				uni.request({
 					url: 'https://datie123.com/entry/getEntryList',
 					method: 'GET',
