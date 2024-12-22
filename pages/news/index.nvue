@@ -21,30 +21,28 @@
 		</uni-nav-bar>
 		<uni-drawer ref="showLeft" mode="left" :mask-click="true">
 			<scroll-view style="height: 100%;" scroll-y="true">
-				<image class="drawer-image" src="/static/DT-logo_color.png" mode="aspectFit" />
-				<view class="drawer-item">
-					<uni-icons type="home"></uni-icons>
-					<text class="drawer-text">首页</text>
+				<view style="align-items: center; margin-top: 20px;">
+					<image class="drawer-image" src="/static/DT-logo_color.png" mode="aspectFit" style="align-self: center; height: 40px;" />
 				</view>
-				<view class="drawer-item">
+				<view class="drawer-item" @click="scrollToSection('article')" style="margin-top: 20px;">
 					<uni-icons type="email"></uni-icons>
-					<text class="drawer-text">文章</text>
+					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">文章</text>
 				</view>
-				<view class="drawer-item">
+				<view class="drawer-item" @click="scrollToSection('game')">
 					<uni-icons type="person"></uni-icons>
-					<text class="drawer-text">赛事</text>
+					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">赛事</text>
 				</view>
-				<view class="drawer-item">
+				<view class="drawer-item" @click="scrollToSection('gear')">
 					<uni-icons type="person"></uni-icons>
-					<text class="drawer-text">装备</text>
+					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">装备</text>
 				</view>
-				<view class="drawer-item">
+				<view class="drawer-item" @click="scrollToSection('team')">
 					<uni-icons type="person"></uni-icons>
-					<text class="drawer-text">团队</text>
+					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">团队</text>
 				</view>
 			</scroll-view>
 		</uni-drawer>
-		<uni-card :style="{ margin: '4px' }" title="文章">
+		<uni-card id="article" :style="{ margin: '4px' }" title="文章">
 			<template v-slot:title>
 				<view class='section-item'>
 					<image class="section-image" src="/static/资讯.svg" mode="aspectFit" />
@@ -60,7 +58,7 @@
 				</uni-grid-item>
 			</uni-grid>
 		</uni-card>
-		<uni-card :style="{ margin: '4px' }" title="赛事">
+		<uni-card id="game" :style="{ margin: '4px' }" title="赛事">
 			<template v-slot:title>
 				<view class='section-item'>
 					<image class="section-image" src="/static/比赛.svg" mode="aspectFit" />
@@ -99,7 +97,7 @@
 				</uni-grid-item>
 			</uni-grid>
 		</uni-card>
-		<uni-card :style="{ margin: '4px' }" title="装备">
+		<uni-card id="gear" :style="{ margin: '4px' }" title="装备">
 			<template v-slot:title>
 				<view class='section-item'>
 					<image class="section-image" src="/static/装备.svg" mode="aspectFit" />
@@ -135,7 +133,7 @@
 				</uni-grid-item>
 			</uni-grid>
 		</uni-card>
-		<uni-card :style="{ margin: '4px' }" title="团队">
+		<uni-card id="team" :style="{ margin: '4px' }" title="团队">
 			<template v-slot:title>
 				<view class='section-item'>
 					<image class="section-image" src="/static/团队.svg" mode="aspectFit" />
@@ -413,7 +411,7 @@
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.gameRank2[this.gameRank2Index];
 				uni.request({
-					url: 'https://www.datie123.com/entry/getEntryList',
+					url: 'https://datie123.com/entry/getEntryList',
 					method: 'GET',
 					data: {
 						sport_type: sportType,
@@ -442,7 +440,7 @@
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.gearRank2[this.gearRank2Index];
 				uni.request({
-					url: 'https://www.datie123.com/entry/getEntryList',
+					url: 'https://datie123.com/entry/getEntryList',
 					method: 'GET',
 					data: {
 						sport_type: sportType,
@@ -471,7 +469,7 @@
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.teamRank2[this.teamRank2Index];
 				uni.request({
-					url: 'https://www.datie123.com/entry/getEntryList',
+					url: 'https://datie123.com/entry/getEntryList',
 					method: 'GET',
 					data: {
 						sport_type: sportType,
@@ -499,7 +497,7 @@
 
 			queryTeamDicList() {
 				uni.request({
-					url: 'https://www.datie123.com/entry/getRankList',
+					url: 'https://datie123.com/entry/getRankList',
 					method: 'GET',
 					data: {
 						rank1: "团体"
@@ -533,7 +531,7 @@
 			},
 			queryGearDicList() {
 				uni.request({
-					url: 'https://www.datie123.com/entry/getRankList',
+					url: 'https://datie123.com/entry/getRankList',
 					method: 'GET',
 					data: {
 						rank1: "装备"
@@ -654,7 +652,35 @@
 				// #ifdef H5
 				window.open('https://beian.miit.gov.cn/', '_blank');
 				// #endif
-			}
+			},
+
+			scrollToSection(sectionId) {
+				// Close drawer first
+				this.closeDrawer();
+				
+				// Use dom module to scroll to element
+				// #ifdef APP-PLUS-NVUE
+				const dom = weex.requireModule('dom');
+				const el = this.$refs[sectionId];
+				if (el) {
+					dom.scrollToElement(el, {
+						offset: 0,
+						animated: true
+					});
+				}
+				// #endif
+				
+				// For H5 platform
+				// #ifdef H5
+				const element = document.getElementById(sectionId);
+				if (element) {
+					element.scrollIntoView({ 
+						behavior: 'smooth',
+						block: 'start'
+					});
+				}
+				// #endif
+			},
 		}
 	}
 </script>
