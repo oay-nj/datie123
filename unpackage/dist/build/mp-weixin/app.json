@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "pages/news/index",
+    "pages/news/detail"
+  ],
+  "window": {
+    "navigationStyle": "custom",
+    "navigationBarTextStyle": "white",
+    "navigationBarBackgroundColor": "#2F85FC",
+    "backgroundColor": "#FFFFFF"
+  },
+  "usingComponents": {}
+}

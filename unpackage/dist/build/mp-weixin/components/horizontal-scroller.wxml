@@ -1,0 +1,1 @@
+<scroll-view class="scroll-view-horizontal data-v-84c6ac5e" scroll-x="true" show-scrollbar="{{false}}"><view wx:for="{{a}}" wx:for-item="computedTab" wx:key="c" class="{{['tab-item', 'data-v-84c6ac5e', computedTab.b && 'is-selected']}}" bindtap="{{computedTab.d}}">{{computedTab.a}}</view></scroll-view>
