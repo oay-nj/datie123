@@ -1,5 +1,5 @@
-# uni-template-news
-基于uni-app开发的新闻/资讯类App模板
+# uni
+基于uni-app开发
 
 ## 体验方式
 同步/下载项目后，拖入 HBuilderX 中即可运行体验。
