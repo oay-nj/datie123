@@ -360,9 +360,16 @@
 				// if (!url?.trim()) {
 				// 	return;
 				// }
-				uni.navigateTo({
-					url: '/pages/news/detail?query=' + encodeURIComponent(url)
-				});
+				// uni.navigateTo({
+				// 	url: '/pages/news/detail?query=' + encodeURIComponent(url)
+				// });
+				// #ifdef APP-PLUS
+				plus.runtime.openURL(url);
+				// #endif
+				
+				// #ifdef H5
+				window.open(url, '_blank');
+				// #endif
 			},
 
 			onClickGearDetailItem(item) {
