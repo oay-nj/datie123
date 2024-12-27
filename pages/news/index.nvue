@@ -373,13 +373,51 @@
 			},
 
 			onClickGearDetailItem(item) {
-				let url = item.link_main;
-				// if (!url?.trim()) {
-				// 	return;
-				// }
-				uni.navigateTo({
-					url: '/pages/news/detail?query=' + encodeURIComponent(url)
-				});
+				const jdUrl = item.link_jd || "";
+				const taobaoUrl = item.link_taobao || "";
+				// If both URLs exist, show action sheet
+				if (jdUrl.length > 0 && taobaoUrl.length > 0) {
+					uni.showActionSheet({
+						itemList: ['去京东购买', '去淘宝购买'],
+						success: (res) => {
+							switch (res.tapIndex) {
+								case 0: // 京东
+									// #ifdef APP-PLUS
+									plus.runtime.openURL(jdUrl);
+									// #endif
+									// #ifdef H5
+									window.open(jdUrl, '_blank');
+									// #endif
+									break;
+								case 1: // 淘宝
+									// #ifdef APP-PLUS
+									plus.runtime.openURL(taobaoUrl);
+									// #endif
+									// #ifdef H5
+									window.open(taobaoUrl, '_blank');
+									// #endif
+									break;
+							}
+						}
+					});
+				} 
+				// If only one URL exists, navigate directly
+				else if (jdUrl) {
+					// #ifdef APP-PLUS
+					plus.runtime.openURL(jdUrl);
+					// #endif
+					// #ifdef H5
+					window.open(jdUrl, '_blank');
+					// #endif
+				} 
+				else if (taobaoUrl) {
+					// #ifdef APP-PLUS
+					plus.runtime.openURL(taobaoUrl);
+					// #endif
+					// #ifdef H5
+					window.open(taobaoUrl, '_blank');
+					// #endif
+				}
 			},
 
 			onClickTeamDetailItem(item) {
