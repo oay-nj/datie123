@@ -123,11 +123,11 @@
 			</template>
 			<uni-grid :column="2" :showBorder="false" :square="false">
 				<uni-grid-item v-for="(item, index) in filterGearList" :key="index" @click="onClickGearDetailItem(item)">
-					<view class="city">
-						<image :src="item.icon" style="width: 36px; height: 36px; padding-right: 5px; flex-shrink: 0;"></image>
+					<view class="city" style="padding-top: 6px">
+						<image :src="item.icon" mode="aspectFit" style="width: 40px; height: 40px; padding-right: 5px; flex-shrink: 0;"></image>
 						<view style="flex: 1; overflow: hidden;">
-							<text class="grid-item-title" >{{item.brand}}</text>
-							<text class="grid-item-title" >{{item.title}}</text>
+							<text class="grid-item-title" style="height: 18px;">{{item.brand}}</text>
+							<text class="grid-item-sub-title" style="height: 18px;">{{item.title}}</text>
 						</view>
 					</view>
 				</uni-grid-item>
@@ -505,6 +505,7 @@
 
 				// First page request
 				fetchPage().then((result) => {
+					console.log("EEEEEE", result);
 					if (result.statusCode === 200) {
 						let resList = [];
 						let json = result.data;
@@ -659,7 +660,7 @@
 						rank1: "装备"
 					}
 				}).then((result) => {
-					// 成功处理
+					// 成功处理					
 					let resList = [];
 					let json = result.data;
 					if (json.code == 0) {
@@ -695,7 +696,6 @@
 					}
 				}).then((result) => {
 					// 成功处理
-					console.log("EEEEEE", result);
 					let resList = [];
 					let json = result.data;
 					if (json.code == 0) {
@@ -827,6 +827,15 @@
 
 	.grid-item-title {
 		font-size: 12px;
+		color: #333333;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		padding-right: 18px;
+	}
+	
+	.grid-item-sub-title {
+		font-size: 10px;
 		color: #333333;
 		white-space: nowrap;
 		overflow: hidden;
