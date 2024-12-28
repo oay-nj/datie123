@@ -1,6 +1,6 @@
 <template>
 	<view class="box-bg">
-		<uni-nav-bar>
+		<uni-nav-bar fixed>
 			<template v-slot:left>
 				<view class="city" @click="showDrawer">
 					<image class="navi-left-image" src="/static/meun.svg" mode="aspectFit" />
@@ -22,7 +22,8 @@
 		<uni-drawer ref="showLeft" mode="left" :mask-click="true">
 			<scroll-view style="height: 100%;" scroll-y="true">
 				<view style="align-items: center; margin-top: 20px;">
-					<image class="drawer-image" src="/static/DT-logo_color.png" mode="aspectFit" style="align-self: center; height: 40px;" />
+					<image class="drawer-image" src="/static/DT-logo_color.png" mode="aspectFit"
+						style="align-self: center; height: 40px;" />
 				</view>
 				<view class="drawer-item" @click="scrollToSection('article')" style="margin-top: 20px;">
 					<uni-icons type="email"></uni-icons>
@@ -74,19 +75,18 @@
 				<view class="hr-line"></view>
 				<horizontalScroller :tabs="gameRank3" @tab-change="handleGameRank3Selected"></horizontalScroller>
 				<view class="tag-container">
-					<uni-tag class="tag-padding" v-for="(tag, index) in gameRank4" 
-					:key="index" :text="tag" 
-					:custom-style="tag === gameRank4selected ? 
+					<uni-tag class="tag-padding" v-for="(tag, index) in gameRank4" :key="index" :text="tag"
+						:custom-style="tag === gameRank4selected ? 
 					'background-color: #FBE7E9; border: none; color: #CE2C32' : 
-					'background-color: #EFEFEF; border: none; color: #333333'" 
-					@click="onSelectGameRank4(tag)">
+					'background-color: #EFEFEF; border: none; color: #333333'" @click="onSelectGameRank4(tag)">
 					</uni-tag>
 				</view>
 			</template>
 			<uni-grid :column="2" :showBorder="false" :square="false">
 				<uni-grid-item v-for="(item, index) in filterGameList" :key="index" @click="onClickDetailItem(item)">
 					<view class="city" style="padding-top: 6px">
-						<image :src="item.icon" mode="aspectFit" style="width: 40px; height: 40px; padding-right: 5px; flex-shrink: 0;"></image>
+						<image :src="item.icon" mode="aspectFit"
+							style="width: 40px; height: 40px; padding-right: 5px; flex-shrink: 0;"></image>
 						<view style="flex: 1; overflow: hidden;">
 							<text class="grid-item-title" style="height: 18px;">{{item.title}}</text>
 							<text class="grid-item-sub-title" style="height: 18px;">{{item.title_eng}}</text>
@@ -111,18 +111,19 @@
 				<view class="hr-line"></view>
 				<horizontalScroller :tabs="gearRank3" @tab-change="handleGearRank3Selected"></horizontalScroller>
 				<view class="tag-container">
-					<uni-tag class="tag-padding" v-for="(tag, index) in gearRank4" 
-					:key="index" :text="tag" :custom-style="tag === gearRank4selected ?
+					<uni-tag class="tag-padding" v-for="(tag, index) in gearRank4" :key="index" :text="tag"
+						:custom-style="tag === gearRank4selected ?
 					'background-color: #FBE7E9; border: none; color: #CE2C32' : 
-					'background-color: #EFEFEF; border: none; color: #333333'"
-					@click="onSelectGearRank4(tag)">
+					'background-color: #EFEFEF; border: none; color: #333333'" @click="onSelectGearRank4(tag)">
 					</uni-tag>
 				</view>
 			</template>
 			<uni-grid :column="2" :showBorder="false" :square="false">
-				<uni-grid-item v-for="(item, index) in filterGearList" :key="index" @click="onClickGearDetailItem(item)">
+				<uni-grid-item v-for="(item, index) in filterGearList" :key="index"
+					@click="onClickGearDetailItem(item)">
 					<view class="city" style="padding-top: 6px">
-						<image :src="item.icon" mode="aspectFit" style="width: 40px; height: 40px; padding-right: 5px; flex-shrink: 0;"></image>
+						<image :src="item.icon" mode="aspectFit"
+							style="width: 40px; height: 40px; padding-right: 5px; flex-shrink: 0;"></image>
 						<view style="flex: 1; overflow: hidden;">
 							<text class="grid-item-title" style="height: 18px;">{{item.brand}}</text>
 							<text class="grid-item-sub-title" style="height: 18px;">{{item.title}}</text>
@@ -147,17 +148,16 @@
 				<view class="hr-line"></view>
 				<horizontalScroller :tabs="teamRank3" @tab-change="handleTeamRank3Selected"></horizontalScroller>
 				<view class="tag-container">
-					<uni-tag class="tag-padding" v-for="(tag, index) in teamRank4" 
-					:key="index" :text="tag" 
-					:custom-style="tag === teamRank4selected ? 
+					<uni-tag class="tag-padding" v-for="(tag, index) in teamRank4" :key="index" :text="tag"
+						:custom-style="tag === teamRank4selected ? 
 					'background-color: #FBE7E9; border: none; color: #CE2C32' : 
-					'background-color: #EFEFEF; border: none; color: #333333'" 
-					@click="onSelectTeamRank4(tag)">
+					'background-color: #EFEFEF; border: none; color: #333333'" @click="onSelectTeamRank4(tag)">
 					</uni-tag>
 				</view>
 			</template>
 			<uni-grid :column="2" :showBorder="false" :square="false">
-				<uni-grid-item v-for="(item, index) in filterTeamList" :key="index" @click="onClickTeamDetailItem(item)">
+				<uni-grid-item v-for="(item, index) in filterTeamList" :key="index"
+					@click="onClickTeamDetailItem(item)">
 					<view class="city">
 						<image src="/static/team.png" style="width: 32px; height: 32px; padding-right: 5px;"></image>
 						<text class="grid-item-title">{{item.title}}</text>
@@ -166,7 +166,7 @@
 			</uni-grid>
 		</uni-card>
 		<view class="beian-container">
-		    <text class="beian-text" @click="openBeianLink">备案号：苏ICP备2022016640号-3</text>
+			<text class="beian-text" @click="openBeianLink">备案号：苏ICP备2022016640号-3</text>
 		</view>
 	</view>
 </template>
@@ -321,10 +321,6 @@
 				}
 				this.queryTeamData();
 			},
-			handleTabSelected(selectedTab) {
-				// this.selectedTab = selectedTab;
-				console.log('选中的标签:', JSON.stringify(selectedTab));
-			},
 			onSelectGameRank4(tab) {
 				this.gameRank4selected = tab;
 			},
@@ -339,32 +335,29 @@
 				let rank2Cur = this.gameRank2[this.gameRank2Index];
 				let rank33 = this.getRank3Sublist(this.gameHierarchy, "赛事", rank2Cur, selectedTab);
 				this.gameRank4 = rank33;
+				this.queryGameData();
 			},
 			handleGearRank3Selected(selectedTab) {
 				this.gearRank3selected = selectedTab;
 				let rank2Cur = this.gearRank2[this.gearRank2Index];
 				let rank33 = this.getRank3Sublist(this.gearHierarchy, "装备", rank2Cur, selectedTab);
 				this.gearRank4 = rank33;
+				this.queryGearData();
 			},
 			handleTeamRank3Selected(selectedTab) {
 				this.teamRank3selected = selectedTab;
 				let rank2Cur = this.teamRank2[this.teamRank2Index];
 				let rank33 = this.getRank3Sublist(this.teamHierarchy, "团体", rank2Cur, selectedTab);
 				this.teamRank4 = rank33;
+				this.queryTeamData();
 			},
 
 			onClickDetailItem(item) {
 				let url = item.link_main;
-				// if (!url?.trim()) {
-				// 	return;
-				// }
-				// uni.navigateTo({
-				// 	url: '/pages/news/detail?query=' + encodeURIComponent(url)
-				// });
 				// #ifdef APP-PLUS
 				plus.runtime.openURL(url);
 				// #endif
-				
+
 				// #ifdef H5
 				window.open(url, '_blank');
 				// #endif
@@ -374,23 +367,24 @@
 				const mainUrl = item.link_main || "";
 				const jdUrl = item.link_jd || "";
 				const taobaoUrl = item.link_taobao || "";
-				
+
 				// Count how many valid URLs we have
 				const urls = [mainUrl, jdUrl, taobaoUrl].filter(url => url.length > 0);
-				
+
 				if (urls.length > 1) {
 					const itemList = [];
 					if (mainUrl) itemList.push('去官网购买');
 					if (jdUrl) itemList.push('去京东购买');
 					if (taobaoUrl) itemList.push('去淘宝购买');
-					
+
 					uni.showActionSheet({
 						itemList,
 						success: (res) => {
 							let url = '';
 							if (mainUrl && res.tapIndex === 0) {
 								url = mainUrl;
-							} else if (jdUrl && ((mainUrl && res.tapIndex === 1) || (!mainUrl && res.tapIndex === 0))) {
+							} else if (jdUrl && ((mainUrl && res.tapIndex === 1) || (!mainUrl && res
+									.tapIndex === 0))) {
 								url = jdUrl;
 							} else {
 								url = taobaoUrl;
@@ -418,12 +412,13 @@
 
 			onClickTeamDetailItem(item) {
 				let url = item.link_main;
-				// if (!url?.trim()) {
-				// 	return;
-				// }
-				uni.navigateTo({
-					url: '/pages/news/detail?query=' + encodeURIComponent(url)
-				});
+				// #ifdef APP-PLUS
+				plus.runtime.openURL(url);
+				// #endif
+				
+				// #ifdef H5
+				window.open(url, '_blank');
+				// #endif
 			},
 
 			queryArticleList() {
@@ -434,7 +429,6 @@
 					data: {
 						sport_type: sportType,
 						rank1: "文章",
-						order_type: '1',
 					}
 				}).then((result) => {
 					if (result.statusCode === 200) {
@@ -456,8 +450,7 @@
 			queryGameData() {
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.gameRank2[this.gameRank2Index];
-				
-				// Helper function to make the request
+				let rank3Cur = this.gameRank3selected || "";
 				const fetchPage = (lastEntryId = '') => {
 					return uni.request({
 						url: 'https://datie123.com/entry/getEntryList',
@@ -466,15 +459,18 @@
 							sport_type: sportType,
 							rank1: "赛事",
 							rank2: rank2Cur,
+							rank3: rank3Cur,
 							order_type: '1',
 							entry_id: lastEntryId // Add entry_id parameter for pagination
 						}
 					});
 				};
-
-				// First page request
+				uni.showLoading({
+					title: '加载中...',
+					mask: true
+				});
 				fetchPage().then((result) => {
-					console.log("EEEEEE", result);
+					uni.hideLoading();
 					if (result.statusCode === 200) {
 						let resList = [];
 						let json = result.data;
@@ -484,46 +480,18 @@
 								let entry = EntryModel.fromJSON(obj);
 								resList.push(entry);
 							}
-
-							// If we have results and haven't reached 40 items yet, fetch the second page
-							if (resList.length > 0 && resList.length < 160) {
-								const lastEntryId = resList[resList.length - 1].entry_id;
-								
-								// Second page request
-								fetchPage(lastEntryId).then((secondResult) => {
-									if (secondResult.statusCode === 200) {
-										let secondJson = secondResult.data;
-										if (secondJson.code == 0) {
-											let secondRes = secondJson.entry_list;
-											for (let obj of secondRes) {
-												let entry = EntryModel.fromJSON(obj);
-												resList.push(entry);
-											}
-										}
-										// Update the gameList with all items (up to 40)
-										this.gameList = resList.slice(0, 160);
-									}
-								});
-							} else {
-								// If we have less than 20 items or exactly 20 items, use just the first page
-								this.gameList = resList;
-							}
 						}
+						this.gameList = resList;
 					}
+				}).catch(() => {
+					uni.hideLoading();
 				});
 			},
 
 			queryGearData() {
-				// Show loading indicator
-				uni.showLoading({
-					title: '加载中...',
-					mask: true
-				});
-
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.gearRank2[this.gearRank2Index];
-				
-				// Helper function to make the request
+				let rank3Cur = this.gearRank3selected || "";
 				const fetchPage = (lastEntryId = '') => {
 					return uni.request({
 						url: 'https://datie123.com/entry/getEntryList',
@@ -532,14 +500,18 @@
 							sport_type: sportType,
 							rank1: "装备",
 							rank2: rank2Cur,
+							rank3: rank3Cur,
 							order_type: '1',
 							entry_id: lastEntryId
 						}
 					});
 				};
-
-				// First page request
+				uni.showLoading({
+					title: '加载中...',
+					mask: true
+				});
 				fetchPage().then((result) => {
+					uni.hideLoading();
 					if (result.statusCode === 200) {
 						let resList = [];
 						let json = result.data;
@@ -549,46 +521,10 @@
 								let entry = EntryModel.fromJSON(obj);
 								resList.push(entry);
 							}
-
-							// If we have results and haven't reached 240 items yet, fetch the second page
-							if (resList.length > 0 && resList.length < 240) {
-								const lastEntryId = resList[resList.length - 1].entry_id;
-								
-								// Second page request
-								fetchPage(lastEntryId).then((secondResult) => {
-									if (secondResult.statusCode === 200) {
-										let secondJson = secondResult.data;
-										if (secondJson.code == 0) {
-											let secondRes = secondJson.entry_list;
-											for (let obj of secondRes) {
-												let entry = EntryModel.fromJSON(obj);
-												resList.push(entry);
-											}
-										}
-										this.gearList = resList.slice(0, 240);
-									}
-									// Hide loading indicator after second request completes
-									uni.hideLoading();
-								}).catch(() => {
-									// Hide loading on error
-									uni.hideLoading();
-								});
-							} else {
-								// If we have less than first page items, use just the first page
-								this.gearList = resList;
-								// Hide loading indicator after first request completes
-								uni.hideLoading();
-							}
-						} else {
-							// Hide loading if the response code is not 0
-							uni.hideLoading();
 						}
-					} else {
-						// Hide loading if the status code is not 200
-						uni.hideLoading();
+						this.gearList = resList;
 					}
 				}).catch(() => {
-					// Hide loading on error
 					uni.hideLoading();
 				});
 			},
@@ -596,8 +532,7 @@
 			queryTeamData() {
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.teamRank2[this.teamRank2Index];
-				
-				// Helper function to make the request
+				let rank3Cur = this.teamRank3selected || "";
 				const fetchPage = (lastEntryId = '') => {
 					return uni.request({
 						url: 'https://datie123.com/entry/getEntryList',
@@ -606,14 +541,15 @@
 							sport_type: sportType,
 							rank1: "团体",
 							rank2: rank2Cur,
+							rank3: rank3Cur,
 							order_type: '1',
 							entry_id: lastEntryId
 						}
 					});
 				};
-
 				// First page request
 				fetchPage().then((result) => {
+					console.log("QQQ", result);
 					if (result.statusCode === 200) {
 						let resList = [];
 						let json = result.data;
@@ -623,31 +559,8 @@
 								let entry = EntryModel.fromJSON(obj);
 								resList.push(entry);
 							}
-
-							// If we have results and haven't reached 40 items yet, fetch the second page
-							if (resList.length > 0 && resList.length < 200) {
-								const lastEntryId = resList[resList.length - 1].entry_id;
-								
-								// Second page request
-								fetchPage(lastEntryId).then((secondResult) => {
-									if (secondResult.statusCode === 200) {
-										let secondJson = secondResult.data;
-										if (secondJson.code == 0) {
-											let secondRes = secondJson.entry_list;
-											for (let obj of secondRes) {
-												let entry = EntryModel.fromJSON(obj);
-												resList.push(entry);
-											}
-										}
-										// Update the teamList with all items (up to 40)
-										this.teamList = resList.slice(0, 200);
-									}
-								});
-							} else {
-								// If we have less than 20 items or exactly 20 items, use just the first page
-								this.teamList = resList;
-							}
 						}
+						this.teamList = resList;
 					}
 				});
 			},
@@ -804,7 +717,7 @@
 				// #ifdef APP-PLUS
 				plus.runtime.openURL('https://beian.miit.gov.cn/');
 				// #endif
-				
+
 				// #ifdef H5
 				window.open('https://beian.miit.gov.cn/', '_blank');
 				// #endif
@@ -813,7 +726,7 @@
 			scrollToSection(sectionId) {
 				// Close drawer first
 				this.closeDrawer();
-				
+
 				// Use dom module to scroll to element
 				// #ifdef APP-PLUS-NVUE
 				const dom = weex.requireModule('dom');
@@ -825,12 +738,12 @@
 					});
 				}
 				// #endif
-				
+
 				// For H5 platform
 				// #ifdef H5
 				const element = document.getElementById(sectionId);
 				if (element) {
-					element.scrollIntoView({ 
+					element.scrollIntoView({
 						behavior: 'smooth',
 						block: 'start'
 					});
@@ -867,7 +780,7 @@
 		text-overflow: ellipsis;
 		padding-right: 18px;
 	}
-	
+
 	.grid-item-sub-title {
 		font-size: 10px;
 		color: #333333;
@@ -973,8 +886,8 @@
 		/* #ifndef APP-PLUS-NVUE */
 		display: flex;
 		/* #endif */
-		width: 32px;
-		height: 32px;
+		width: 20px;
+		height: 20px;
 	}
 
 	.section-image-drop-down {
@@ -1014,25 +927,27 @@
 		display: flex;
 		/* #endif */
 		flex: 1;
-		width: 100%;
+		// width: 100%;
 		flex-direction: row-reverse;
 		// background-color: #ff0000;
-		height: $nav-height;
+		height: 90%;
 		flex-wrap: nowrap;
 	}
+
 	.beian-container {
-	  padding: 10px;
-	  text-align: center;
-	  font-size: 14px;
-	  color: #999;
+		padding: 10px;
+		text-align: center;
+		font-size: 14px;
+		color: #999;
 	}
-	
+
 	.beian-text {
-	  margin-right: 8px;
+		margin-right: 8px;
 	}
-	
+
 	.beian-link {
-	  color: #999;
-	  text-decoration: none; /* 取消下划线 */
+		color: #999;
+		text-decoration: none;
+		/* 取消下划线 */
 	}
 </style>
