@@ -85,14 +85,12 @@
 			</template>
 			<uni-grid :column="2" :showBorder="false" :square="false">
 				<uni-grid-item v-for="(item, index) in filterGameList" :key="index" @click="onClickDetailItem(item)">
-					<text class="grid-item-title">{{item.title}}</text>
-					<view class="city">
-						<uni-tag class="tag-sub-padding"
-							custom-style="background-color: #EFEFEF; border-color: #CE2C32; color: #CE2C32;"
-							:text=" item.brand "></uni-tag>
-						<uni-tag class="tag-sub-padding"
-							custom-style="background-color: #EFEFEF; border-color: #CE2C32; color: #CE2C32;"
-							:text=" item.area "></uni-tag>
+					<view class="city" style="padding-top: 6px">
+						<image :src="item.icon" mode="aspectFit" style="width: 40px; height: 40px; padding-right: 5px; flex-shrink: 0;"></image>
+						<view style="flex: 1; overflow: hidden;">
+							<text class="grid-item-title" style="height: 18px;">{{item.title}}</text>
+							<text class="grid-item-sub-title" style="height: 18px;">{{item.title_eng}}</text>
+						</view>
 					</view>
 				</uni-grid-item>
 			</uni-grid>
@@ -476,6 +474,7 @@
 
 				// First page request
 				fetchPage().then((result) => {
+					console.log("EEEEEE", result);
 					if (result.statusCode === 200) {
 						let resList = [];
 						let json = result.data;
@@ -541,7 +540,6 @@
 
 				// First page request
 				fetchPage().then((result) => {
-					console.log("EEEEEE", result);
 					if (result.statusCode === 200) {
 						let resList = [];
 						let json = result.data;
