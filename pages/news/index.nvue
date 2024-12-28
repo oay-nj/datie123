@@ -165,6 +165,39 @@
 				</uni-grid-item>
 			</uni-grid>
 		</uni-card>
+		<uni-card id="brand" :style="{ margin: '4px' }" title="品牌">
+			<template v-slot:title>
+				<view class='section-item'>
+					<image class="section-image" src="/static/品牌.png" mode="aspectFit" />
+					<text class="text-h1">品牌</text>
+					<view class="section-title-space"></view>
+					<picker @change="bindBrandRank2PickerChange" :value="brandRank2Index" :range="brandRank2">
+						<view class="city">
+							<view class="text-h1">{{brandRank2[brandRank2Index]}}</view>
+							<image class="section-image-drop-down" src="/static/frop-down.svg" mode="aspectFit" />
+						</view>
+					</picker>
+				</view>
+				<view class="hr-line"></view>
+				<horizontalScroller :tabs="brandRank3" @tab-change="handleBrandRank3Selected"></horizontalScroller>
+				<view class="tag-container">
+					<uni-tag class="tag-padding" v-for="(tag, index) in brandRank4" :key="index" :text="tag"
+						:custom-style="tag === brandRank4selected ? 
+					'background-color: #FBE7E9; border: none; color: #CE2C32' : 
+					'background-color: #EFEFEF; border: none; color: #333333'" @click="onSelectBrandRank4(tag)">
+					</uni-tag>
+				</view>
+			</template>
+			<uni-grid :column="5" :showBorder="false" :square="false">
+				<uni-grid-item v-for="(item, index) in filterBrandList" :key="index"
+					@click="onClickBrandDetailItem(item)">
+					<view class="cell-card">
+						<image src="/static/brand.png" style="width: 48px; height: 48px; padding-bottom: 4px;"></image>
+						<text class="grid-item-title">{{item.title}}</text>
+					</view>
+				</uni-grid-item>
+			</uni-grid>
+		</uni-card>
 		<view class="beian-container">
 			<text class="beian-text" @click="openBeianLink">备案号：苏ICP备2022016640号-3</text>
 		</view>
@@ -236,6 +269,22 @@
 						item.rank3 === rank3Cur
 				});
 				return filteredData;
+			},
+			filterBrandList() {
+				// 过滤数据
+				let rank2Cur = this.brandRank2[this.brandRank2Index];
+				let rank3Cur = this.brandRank3selected;
+				let rank4Cur = this.brandRank4selected;
+				const filteredData = this.brandList.filter(item => {
+					if (rank4Cur.length > 0) {
+						return item.rank2 === rank2Cur &&
+							item.rank3 === rank3Cur &&
+							item.rank4 === rank4Cur
+					}
+					return item.rank2 === rank2Cur &&
+						item.rank3 === rank3Cur
+				});
+				return filteredData;
 			}
 		},
 		data() {
@@ -245,6 +294,7 @@
 				}],
 				typeIndex: 0,
 				articleList: [],
+
 				gameHierarchy: {},
 				gameRank2: [],
 				gameRank2Index: 0,
@@ -253,6 +303,7 @@
 				gameRank4: [],
 				gameRank4selected: '',
 				gameList: [],
+
 				gearHierarchy: {},
 				gearRank2: [],
 				gearRank2Index: 0,
@@ -261,6 +312,7 @@
 				gearRank4: [],
 				gearRank4selected: '',
 				gearList: [],
+
 				teamHierarchy: {},
 				teamRank2: [],
 				teamRank2Index: 0,
@@ -269,12 +321,22 @@
 				teamRank4: [],
 				teamRank4selected: '',
 				teamList: [],
+
+				brandHierarchy: {},
+				brandRank2: [],
+				brandRank2Index: 0,
+				brandRank3: [],
+				brandRank3selected: '',
+				brandRank4: [],
+				brandRank4selected: '',
+				brandList: [],
 			}
 		},
 		onReady() {
 			this.queryDicList();
 			this.queryGearDicList();
 			this.queryTeamDicList();
+			this.queryBrandDicList();
 			this.queryArticleList();
 			// this.queryData();
 			// this.queryTrainData();
@@ -321,6 +383,16 @@
 				}
 				this.queryTeamData();
 			},
+			bindBrandRank2PickerChange: function(e) {
+				this.brandRank2Index = e.detail.value
+				let rank2Cur = this.brandRank2[this.brandRank2Index];
+				if (rank2Cur != undefined) {
+					let rank22 = this.getRank2Sublist(this.brandHierarchy, "品牌", rank2Cur);
+					this.brandRank3 = Object.keys(rank22);
+					this.brandRank3selected = this.brandRank3[0] || '';
+				}
+				this.queryBrandData();
+			},
 			onSelectGameRank4(tab) {
 				this.gameRank4selected = tab;
 			},
@@ -329,6 +401,9 @@
 			},
 			onSelectTeamRank4(tab) {
 				this.teamRank4selected = tab;
+			},
+			onSelectBrandRank4(tab) {
+				this.brandRank4selected = tab;
 			},
 			handleGameRank3Selected(selectedTab) {
 				this.gameRank3selected = selectedTab;
@@ -350,6 +425,13 @@
 				let rank33 = this.getRank3Sublist(this.teamHierarchy, "团体", rank2Cur, selectedTab);
 				this.teamRank4 = rank33;
 				this.queryTeamData();
+			},
+			handleBrandRank3Selected(selectedTab) {
+				this.brandRank3selected = selectedTab;
+				let rank2Cur = this.brandRank2[this.brandRank2Index];
+				let rank33 = this.getRank3Sublist(this.brandHierarchy, "品牌", rank2Cur, selectedTab);
+				this.brandRank4 = rank33;
+				this.queryBrandData();
 			},
 
 			onClickDetailItem(item) {
@@ -415,7 +497,18 @@
 				// #ifdef APP-PLUS
 				plus.runtime.openURL(url);
 				// #endif
-				
+
+				// #ifdef H5
+				window.open(url, '_blank');
+				// #endif
+			},
+
+			onClickBrandDetailItem(item) {
+				let url = item.link_main;
+				// #ifdef APP-PLUS
+				plus.runtime.openURL(url);
+				// #endif
+
 				// #ifdef H5
 				window.open(url, '_blank');
 				// #endif
@@ -750,6 +843,73 @@
 				}
 				// #endif
 			},
+
+			queryBrandData() {
+				let sportType = this.array[this.typeIndex].type;
+				let rank2Cur = this.brandRank2[this.brandRank2Index];
+				let rank3Cur = this.brandRank3selected || "";
+				const fetchPage = (lastEntryId = '') => {
+					return uni.request({
+						url: 'https://datie123.com/entry/getEntryList',
+						method: 'GET',
+						data: {
+							sport_type: sportType,
+							rank1: "品牌",
+							rank2: rank2Cur,
+							rank3: rank3Cur,
+							order_type: '1',
+							entry_id: lastEntryId
+						}
+					});
+				};
+				fetchPage().then((result) => {
+					if (result.statusCode === 200) {
+						let resList = [];
+						let json = result.data;
+						if (json.code == 0) {
+							let res = json.entry_list;
+							for (let obj of res) {
+								let entry = EntryModel.fromJSON(obj);
+								resList.push(entry);
+							}
+						}
+						this.brandList = resList;
+					}
+				});
+			},
+
+			queryBrandDicList() {
+				uni.request({
+					url: 'https://datie123.com/entry/getRankList',
+					method: 'GET',
+					data: {
+						rank1: "品牌"
+					}
+				}).then((result) => {
+					let json = result.data;
+					if (json.code == 0) {
+						let res = json.rank_list;
+						let treeRes = this.buildHierarchy(res);
+						this.brandHierarchy = treeRes;
+						let rank2 = this.getRank1Sublist(treeRes, "品牌");
+						this.brandRank2 = Object.keys(rank2);
+						let rank2Cur = this.brandRank2[this.brandRank2Index];
+						if (rank2Cur != undefined) {
+							let rank22 = this.getRank2Sublist(treeRes, "品牌", rank2Cur);
+							this.brandRank3 = Object.keys(rank22);
+							if (this.brandRank3.length > 0) {
+								let rank3Cur = this.brandRank3[0];
+								this.brandRank3selected = rank3Cur;
+								if (rank3Cur != undefined) {
+									let rank33 = this.getRank3Sublist(treeRes, "品牌", rank2Cur, rank3Cur);
+									this.brandRank4 = rank33;
+								}
+							}
+						}
+						this.queryBrandData();
+					}
+				});
+			},
 		}
 	}
 </script>
@@ -871,6 +1031,12 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: flex-start;
+	}
+	
+	.cell-card {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
 	}
 
 	.tag-container {
