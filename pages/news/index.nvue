@@ -373,49 +373,47 @@
 			},
 
 			onClickGearDetailItem(item) {
+				const mainUrl = item.link_main || "";
 				const jdUrl = item.link_jd || "";
 				const taobaoUrl = item.link_taobao || "";
-				// If both URLs exist, show action sheet
-				if (jdUrl.length > 0 && taobaoUrl.length > 0) {
+				
+				// Count how many valid URLs we have
+				const urls = [mainUrl, jdUrl, taobaoUrl].filter(url => url.length > 0);
+				
+				if (urls.length > 1) {
+					const itemList = [];
+					if (mainUrl) itemList.push('去官网购买');
+					if (jdUrl) itemList.push('去京东购买');
+					if (taobaoUrl) itemList.push('去淘宝购买');
+					
 					uni.showActionSheet({
-						itemList: ['去京东购买', '去淘宝购买'],
+						itemList,
 						success: (res) => {
-							switch (res.tapIndex) {
-								case 0: // 京东
-									// #ifdef APP-PLUS
-									plus.runtime.openURL(jdUrl);
-									// #endif
-									// #ifdef H5
-									window.open(jdUrl, '_blank');
-									// #endif
-									break;
-								case 1: // 淘宝
-									// #ifdef APP-PLUS
-									plus.runtime.openURL(taobaoUrl);
-									// #endif
-									// #ifdef H5
-									window.open(taobaoUrl, '_blank');
-									// #endif
-									break;
+							let url = '';
+							if (mainUrl && res.tapIndex === 0) {
+								url = mainUrl;
+							} else if (jdUrl && ((mainUrl && res.tapIndex === 1) || (!mainUrl && res.tapIndex === 0))) {
+								url = jdUrl;
+							} else {
+								url = taobaoUrl;
 							}
+							// #ifdef APP-PLUS
+							plus.runtime.openURL(url);
+							// #endif
+							// #ifdef H5
+							window.open(url, '_blank');
+							// #endif
 						}
 					});
-				} 
+				}
 				// If only one URL exists, navigate directly
-				else if (jdUrl) {
+				else if (urls.length === 1) {
+					const url = mainUrl || jdUrl || taobaoUrl;
 					// #ifdef APP-PLUS
-					plus.runtime.openURL(jdUrl);
+					plus.runtime.openURL(url);
 					// #endif
 					// #ifdef H5
-					window.open(jdUrl, '_blank');
-					// #endif
-				} 
-				else if (taobaoUrl) {
-					// #ifdef APP-PLUS
-					plus.runtime.openURL(taobaoUrl);
-					// #endif
-					// #ifdef H5
-					window.open(taobaoUrl, '_blank');
+					window.open(url, '_blank');
 					// #endif
 				}
 			},
