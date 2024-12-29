@@ -281,8 +281,11 @@
 							item.rank3 === rank3Cur &&
 							item.rank4 === rank4Cur
 					}
-					return item.rank2 === rank2Cur &&
-						item.rank3 === rank3Cur
+					if (rank3Cur.length > 0) {
+						return item.rank2 === rank2Cur &&
+							item.rank3 === rank3Cur
+					}
+					return item.rank2 === rank2Cur;
 				});
 				return filteredData;
 			}
@@ -361,6 +364,7 @@
 					this.gameRank3 = Object.keys(rank22);
 					this.gameRank3selected = this.gameRank3[0] || '';
 				}
+				this.gameRank4selected = "";
 				this.queryGameData();
 			},
 			bindGearRank2PickerChange: function(e) {
@@ -371,6 +375,7 @@
 					this.gearRank3 = Object.keys(rank22);
 					this.gearRank3selected = this.gearRank3[0] || '';
 				}
+				this.gearRank4selected = "";
 				this.queryGearData();
 			},
 			bindTeamRank2PickerChange: function(e) {
@@ -381,6 +386,7 @@
 					this.teamRank3 = Object.keys(rank22);
 					this.teamRank3selected = this.teamRank3[0] || '';
 				}
+				this.teamRank4selected = "";
 				this.queryTeamData();
 			},
 			bindBrandRank2PickerChange: function(e) {
@@ -395,12 +401,15 @@
 			},
 			onSelectGameRank4(tab) {
 				this.gameRank4selected = tab;
+				this.queryGameData();
 			},
 			onSelectGearRank4(tab) {
 				this.gearRank4selected = tab;
+				this.queryGearData();
 			},
 			onSelectTeamRank4(tab) {
 				this.teamRank4selected = tab;
+				this.queryTeamData();
 			},
 			onSelectBrandRank4(tab) {
 				this.brandRank4selected = tab;
@@ -410,6 +419,7 @@
 				let rank2Cur = this.gameRank2[this.gameRank2Index];
 				let rank33 = this.getRank3Sublist(this.gameHierarchy, "赛事", rank2Cur, selectedTab);
 				this.gameRank4 = rank33;
+				this.gameRank4selected = "";
 				this.queryGameData();
 			},
 			handleGearRank3Selected(selectedTab) {
@@ -417,6 +427,7 @@
 				let rank2Cur = this.gearRank2[this.gearRank2Index];
 				let rank33 = this.getRank3Sublist(this.gearHierarchy, "装备", rank2Cur, selectedTab);
 				this.gearRank4 = rank33;
+				this.gearRank4selected = "";
 				this.queryGearData();
 			},
 			handleTeamRank3Selected(selectedTab) {
@@ -424,6 +435,7 @@
 				let rank2Cur = this.teamRank2[this.teamRank2Index];
 				let rank33 = this.getRank3Sublist(this.teamHierarchy, "团体", rank2Cur, selectedTab);
 				this.teamRank4 = rank33;
+				this.teamRank4selected = "";
 				this.queryTeamData();
 			},
 			handleBrandRank3Selected(selectedTab) {
@@ -544,6 +556,7 @@
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.gameRank2[this.gameRank2Index];
 				let rank3Cur = this.gameRank3selected || "";
+				let rank4Cur = this.gameRank4selected || "";
 				const fetchPage = (lastEntryId = '') => {
 					return uni.request({
 						url: 'https://datie123.com/entry/getEntryList',
@@ -553,6 +566,7 @@
 							rank1: "赛事",
 							rank2: rank2Cur,
 							rank3: rank3Cur,
+							rank4: rank4Cur,
 							order_type: '1',
 							entry_id: lastEntryId // Add entry_id parameter for pagination
 						}
@@ -642,7 +656,6 @@
 				};
 				// First page request
 				fetchPage().then((result) => {
-					console.log("QQQ", result);
 					if (result.statusCode === 200) {
 						let resList = [];
 						let json = result.data;
@@ -863,6 +876,7 @@
 					});
 				};
 				fetchPage().then((result) => {
+					console.log("QQQ", result);
 					if (result.statusCode === 200) {
 						let resList = [];
 						let json = result.data;
