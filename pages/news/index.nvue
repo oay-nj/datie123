@@ -4,7 +4,6 @@
 			<template v-slot:left>
 				<view class="city" @click="showDrawer">
 					<image class="navi-left-image" src="/static/meun.svg" mode="aspectFit" />
-					<text class="text-h1">菜单</text>
 				</view>
 			</template>
 			<view class="home-icon-bg">
@@ -26,27 +25,27 @@
 						style="align-self: center; height: 40px;" />
 				</view>
 				<view class="drawer-item" @click="scrollToSection('article')" style="margin-top: 20px;">
-					<uni-icons type="email"></uni-icons>
+					<image class="section-image" src="/static/资讯.png" mode="aspectFit" />
 					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">文章</text>
 				</view>
 				<view class="drawer-item" @click="scrollToSection('game')">
-					<uni-icons type="person"></uni-icons>
+					<image class="section-image" src="/static/比赛.svg" mode="aspectFit" />
 					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">赛事</text>
 				</view>
 				<view class="drawer-item" @click="scrollToSection('gear')">
-					<uni-icons type="person"></uni-icons>
+					<image class="section-image" src="/static/装备.svg" mode="aspectFit" />
 					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">装备</text>
 				</view>
 				<view class="drawer-item" @click="scrollToSection('team')">
-					<uni-icons type="person"></uni-icons>
-					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">团队</text>
+					<image class="section-image" src="/static/团队.svg" mode="aspectFit" />
+					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">团体</text>
 				</view>
 			</scroll-view>
 		</uni-drawer>
 		<uni-card id="article" :style="{ margin: '4px' }" title="文章">
 			<template v-slot:title>
 				<view class='section-item'>
-					<image class="section-image" src="/static/资讯.svg" mode="aspectFit" />
+					<image class="section-image" src="/static/资讯.png" mode="aspectFit" />
 					<text class="text-h1">文章</text>
 					<view class="section-title-space"></view>
 					<view class="text-h1">优质文章</view>
@@ -132,11 +131,11 @@
 				</uni-grid-item>
 			</uni-grid>
 		</uni-card>
-		<uni-card id="team" :style="{ margin: '4px' }" title="团队">
+		<uni-card id="team" :style="{ margin: '4px' }" title="团体">
 			<template v-slot:title>
 				<view class='section-item'>
 					<image class="section-image" src="/static/团队.svg" mode="aspectFit" />
-					<text class="text-h1">团队</text>
+					<text class="text-h1">团体</text>
 					<view class="section-title-space"></view>
 					<picker @change="bindTeamRank2PickerChange" :value="teamRank2Index" :range="teamRank2">
 						<view class="city">
@@ -146,7 +145,7 @@
 					</picker>
 				</view>
 				<view class="hr-line"></view>
-				<horizontalScroller :tabs="teamRank3" @tab-change="handleTeamRank3Selected"></horizontalScroller>
+				<horizontalScroller v-if="teamRank3.length > 0" :tabs="teamRank3" @tab-change="handleTeamRank3Selected"></horizontalScroller>
 				<view class="tag-container">
 					<uni-tag class="tag-padding" v-for="(tag, index) in teamRank4" :key="index" :text="tag"
 						:custom-style="tag === teamRank4selected ? 
@@ -159,7 +158,7 @@
 				<uni-grid-item v-for="(item, index) in filterTeamList" :key="index"
 					@click="onClickTeamDetailItem(item)">
 					<view class="city">
-						<image src="/static/team.png" style="width: 32px; height: 32px; padding-right: 5px;"></image>
+						<image src="/static/team.png" mode="aspectFit" style="width: 32px; height: 32px; padding-right: 5px;"></image>
 						<text class="grid-item-title">{{item.title}}</text>
 					</view>
 				</uni-grid-item>
@@ -192,8 +191,8 @@
 				<uni-grid-item v-for="(item, index) in filterBrandList" :key="index"
 					@click="onClickBrandDetailItem(item)">
 					<view class="cell-card">
-						<image src="/static/brand.png" style="width: 48px; height: 48px; padding-bottom: 4px;"></image>
-						<text class="grid-item-title">{{item.title}}</text>
+						<image :src="item.icon" mode="aspectFit" style="width: 48px; height: 48px; padding-bottom: 4px;"></image>
+						<text class="grid-item-title-brand">{{item.title}}</text>
 					</view>
 				</uni-grid-item>
 			</uni-grid>
@@ -256,17 +255,19 @@
 			},
 			filterTeamList() {
 				// 过滤数据
-				let rank2Cur = this.teamRank2[this.teamRank2Index];
+				// let rank2Cur = this.teamRank2[this.teamRank2Index];
 				let rank3Cur = this.teamRank3selected;
 				let rank4Cur = this.teamRank4selected;
 				const filteredData = this.teamList.filter(item => {
-					if (rank4Cur.length > 0) {
-						return item.rank2 === rank2Cur &&
-							item.rank3 === rank3Cur &&
-							item.rank4 === rank4Cur
+					var r3 = true;
+					if (rank3Cur.length > 0) {
+						r3 = item.rank3 === rank3Cur;
 					}
-					return item.rank2 === rank2Cur &&
-						item.rank3 === rank3Cur
+					var r4 = true;
+					if (rank4Cur.length > 0) {
+						r4 = item.rank4 === rank4Cur
+					}
+					return r3 && r4;
 				});
 				return filteredData;
 			},
@@ -363,6 +364,8 @@
 					let rank22 = this.getRank2Sublist(this.gameHierarchy, "赛事", rank2Cur);
 					this.gameRank3 = Object.keys(rank22);
 					this.gameRank3selected = this.gameRank3[0] || '';
+					let rank33 = this.getRank3Sublist(this.gearHierarchy, "赛事", rank2Cur, this.gameRank3selected);
+					this.gameRank4 = rank33;
 				}
 				this.gameRank4selected = "";
 				this.queryGameData();
@@ -374,6 +377,8 @@
 					let rank22 = this.getRank2Sublist(this.gearHierarchy, "装备", rank2Cur);
 					this.gearRank3 = Object.keys(rank22);
 					this.gearRank3selected = this.gearRank3[0] || '';
+					let rank33 = this.getRank3Sublist(this.gearHierarchy, "装备", rank2Cur, this.gearRank3selected);
+					this.gearRank4 = rank33;
 				}
 				this.gearRank4selected = "";
 				this.queryGearData();
@@ -385,6 +390,8 @@
 					let rank22 = this.getRank2Sublist(this.teamHierarchy, "团体", rank2Cur);
 					this.teamRank3 = Object.keys(rank22);
 					this.teamRank3selected = this.teamRank3[0] || '';
+					let rank33 = this.getRank3Sublist(this.gearHierarchy, "团体", rank2Cur, this.teamRank3selected);
+					this.teamRank4 = rank33;
 				}
 				this.teamRank4selected = "";
 				this.queryTeamData();
@@ -396,6 +403,8 @@
 					let rank22 = this.getRank2Sublist(this.brandHierarchy, "品牌", rank2Cur);
 					this.brandRank3 = Object.keys(rank22);
 					this.brandRank3selected = this.brandRank3[0] || '';
+					let rank33 = this.getRank3Sublist(this.gearHierarchy, "品牌", rank2Cur, this.brandRank3selected);
+					this.brandRank4 = rank33;
 				}
 				this.queryBrandData();
 			},
@@ -656,6 +665,7 @@
 				};
 				// First page request
 				fetchPage().then((result) => {
+					console.log("QQQ", result);
 					if (result.statusCode === 200) {
 						let resList = [];
 						let json = result.data;
@@ -698,6 +708,7 @@
 								if (rank3Cur != undefined) {
 									let rank33 = this.getRank3Sublist(treeRes, "团体", rank2Cur, rank3Cur);
 									this.teamRank4 = rank33;
+									this.teamRank4selected = this.teamRank4[0] || "";
 								}
 							}
 						}
@@ -732,6 +743,7 @@
 								if (rank3Cur != undefined) {
 									let rank33 = this.getRank3Sublist(treeRes, "装备", rank2Cur, rank3Cur);
 									this.gearRank4 = rank33;
+									this.gearRank4selected = this.gearRank4[0] || "";
 								}
 							}
 						}
@@ -767,6 +779,7 @@
 								if (rank3Cur != undefined) {
 									let rank33 = this.getRank3Sublist(treeRes, "赛事", rank2Cur, rank3Cur);
 									this.gameRank4 = rank33;
+									this.gameRank4selected = this.gameRank4[0] || "";
 								}
 							}
 						}
@@ -876,7 +889,6 @@
 					});
 				};
 				fetchPage().then((result) => {
-					console.log("QQQ", result);
 					if (result.statusCode === 200) {
 						let resList = [];
 						let json = result.data;
@@ -953,6 +965,20 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		padding-right: 18px;
+	}
+	
+	.grid-item-title-brand {
+		width: 60px;
+		height: 42px;
+		font-size: 12px;
+		text-align: center;
+		color: #333333;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		padding-right: 18px;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2; /* 限制为两行 */
 	}
 
 	.grid-item-sub-title {
@@ -1058,6 +1084,7 @@
 		display: flex;
 		/* #endif */
 		flex-direction: row;
+		margin-top: 8px;
 		align-items: center;
 		justify-content: center;
 	}
