@@ -470,6 +470,7 @@
 				// #ifdef H5
 				window.open(url, '_blank');
 				// #endif
+				this.addSingleStaticsDetail(item);
 			},
 
 			onClickGearDetailItem(item) {
@@ -517,6 +518,7 @@
 					window.open(url, '_blank');
 					// #endif
 				}
+				this.addSingleStaticsDetail(item);
 			},
 
 			onClickTeamDetailItem(item) {
@@ -528,6 +530,7 @@
 				// #ifdef H5
 				window.open(url, '_blank');
 				// #endif
+				this.addSingleStaticsDetail(item);
 			},
 
 			onClickBrandDetailItem(item) {
@@ -539,6 +542,7 @@
 				// #ifdef H5
 				window.open(url, '_blank');
 				// #endif
+				this.addSingleStaticsDetail(item);
 			},
 
 			queryArticleList() {
@@ -942,6 +946,23 @@
 						}
 						this.queryBrandData();
 					}
+				});
+			},
+			
+			addSingleStaticsDetail(item) {
+				const currentTime = new Date().toString();
+				let detailInfo = {
+					entry_id: item.entry_id,
+					element_id: item.id,
+					click_time:currentTime
+				}
+				uni.request({
+					url: 'https://datie123.com/entry/addSingleStaticsDetail',
+					method: 'POST',
+					data: {
+						statics_detail: detailInfo,
+					}
+				}).then((result) => {
 				});
 			},
 		}
