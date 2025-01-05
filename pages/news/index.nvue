@@ -40,6 +40,10 @@
 					<image class="section-image" src="/static/团队.svg" mode="aspectFit" />
 					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">团体</text>
 				</view>
+				<view class="drawer-item" @click="scrollToSection('brand')">
+					<image class="section-image" src="/static/品牌.png" mode="aspectFit" />
+					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">品牌</text>
+				</view>
 			</scroll-view>
 		</uni-drawer>
 		<uni-card id="article" :style="{ margin: '4px' }" title="文章">
@@ -158,8 +162,8 @@
 				<uni-grid-item v-for="(item, index) in filterTeamList" :key="index"
 					@click="onClickTeamDetailItem(item)">
 					<view class="city">
-						<image src="/static/team.png" mode="aspectFit" style="width: 32px; height: 32px; padding-right: 5px;"></image>
-						<text class="grid-item-title">{{item.title}}</text>
+						<image :src="item.icon" mode="aspectFit" style="width: 32px; height: 32px; padding-right: 5px;"></image>
+						<text class="grid-item-title" style="width: 135px; height: 32px;">{{item.title}}</text>
 					</view>
 				</uni-grid-item>
 			</uni-grid>
@@ -366,8 +370,8 @@
 					this.gameRank3selected = this.gameRank3[0] || '';
 					let rank33 = this.getRank3Sublist(this.gearHierarchy, "赛事", rank2Cur, this.gameRank3selected);
 					this.gameRank4 = rank33;
+					this.gameRank4selected = rank33[0] || "";
 				}
-				this.gameRank4selected = "";
 				this.queryGameData();
 			},
 			bindGearRank2PickerChange: function(e) {
@@ -379,8 +383,8 @@
 					this.gearRank3selected = this.gearRank3[0] || '';
 					let rank33 = this.getRank3Sublist(this.gearHierarchy, "装备", rank2Cur, this.gearRank3selected);
 					this.gearRank4 = rank33;
+					this.gearRank4selected = rank33[0] || "";
 				}
-				this.gearRank4selected = "";
 				this.queryGearData();
 			},
 			bindTeamRank2PickerChange: function(e) {
@@ -392,8 +396,8 @@
 					this.teamRank3selected = this.teamRank3[0] || '';
 					let rank33 = this.getRank3Sublist(this.gearHierarchy, "团体", rank2Cur, this.teamRank3selected);
 					this.teamRank4 = rank33;
+					this.teamRank4selected = rank33[0] || "";
 				}
-				this.teamRank4selected = "";
 				this.queryTeamData();
 			},
 			bindBrandRank2PickerChange: function(e) {
@@ -405,6 +409,7 @@
 					this.brandRank3selected = this.brandRank3[0] || '';
 					let rank33 = this.getRank3Sublist(this.gearHierarchy, "品牌", rank2Cur, this.brandRank3selected);
 					this.brandRank4 = rank33;
+					this.brandRank4selected = rank33[0] || "";
 				}
 				this.queryBrandData();
 			},
@@ -428,7 +433,7 @@
 				let rank2Cur = this.gameRank2[this.gameRank2Index];
 				let rank33 = this.getRank3Sublist(this.gameHierarchy, "赛事", rank2Cur, selectedTab);
 				this.gameRank4 = rank33;
-				this.gameRank4selected = "";
+				this.gameRank4selected = rank33[0] || "";
 				this.queryGameData();
 			},
 			handleGearRank3Selected(selectedTab) {
@@ -436,7 +441,7 @@
 				let rank2Cur = this.gearRank2[this.gearRank2Index];
 				let rank33 = this.getRank3Sublist(this.gearHierarchy, "装备", rank2Cur, selectedTab);
 				this.gearRank4 = rank33;
-				this.gearRank4selected = "";
+				this.gearRank4selected = rank33[0] || "";
 				this.queryGearData();
 			},
 			handleTeamRank3Selected(selectedTab) {
@@ -444,7 +449,7 @@
 				let rank2Cur = this.teamRank2[this.teamRank2Index];
 				let rank33 = this.getRank3Sublist(this.teamHierarchy, "团体", rank2Cur, selectedTab);
 				this.teamRank4 = rank33;
-				this.teamRank4selected = "";
+				this.teamRank4selected = rank33[0] || "";
 				this.queryTeamData();
 			},
 			handleBrandRank3Selected(selectedTab) {
@@ -452,6 +457,7 @@
 				let rank2Cur = this.brandRank2[this.brandRank2Index];
 				let rank33 = this.getRank3Sublist(this.brandHierarchy, "品牌", rank2Cur, selectedTab);
 				this.brandRank4 = rank33;
+				this.brandRank4selected = rank33[0] || "";
 				this.queryBrandData();
 			},
 
@@ -608,6 +614,7 @@
 				let sportType = this.array[this.typeIndex].type;
 				let rank2Cur = this.gearRank2[this.gearRank2Index];
 				let rank3Cur = this.gearRank3selected || "";
+				let rank4Cur = this.gearRank4selected || "";
 				const fetchPage = (lastEntryId = '') => {
 					return uni.request({
 						url: 'https://datie123.com/entry/getEntryList',
@@ -617,6 +624,7 @@
 							rank1: "装备",
 							rank2: rank2Cur,
 							rank3: rank3Cur,
+							rank4: rank4Cur,
 							order_type: '1',
 							entry_id: lastEntryId
 						}
@@ -627,6 +635,7 @@
 					mask: true
 				});
 				fetchPage().then((result) => {
+					console.log("QQQ", result);
 					uni.hideLoading();
 					if (result.statusCode === 200) {
 						let resList = [];
@@ -665,7 +674,6 @@
 				};
 				// First page request
 				fetchPage().then((result) => {
-					console.log("QQQ", result);
 					if (result.statusCode === 200) {
 						let resList = [];
 						let json = result.data;
@@ -1060,8 +1068,8 @@
 	}
 
 	.navi-left-image {
-		height: 36px;
-		width: 36px;
+		height: 22px;
+		width: 22px;
 	}
 
 	.city {
