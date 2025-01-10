@@ -1,6 +1,6 @@
 <template>
 	<view class="box-bg">
-		<uni-nav-bar fixed>
+		<uni-nav-bar shadow :border="false" fixed>
 			<template v-slot:left>
 				<view class="city" @click="showDrawer">
 					<image class="navi-left-image" src="/static/meun.svg" mode="aspectFit" />
@@ -14,7 +14,7 @@
 					<picker @change="bindPickerChange" :value="typeIndex" :range="array" range-key="type">
 						<view class="text-h1">{{array[typeIndex].type}}</view>
 					</picker>
-					<uni-icons class="padding-left" type="down"></uni-icons>
+					<image class="image-padding-left" src="/static/icon-drop-down.png" />
 				</view>
 			</template>
 		</uni-nav-bar>
@@ -43,6 +43,10 @@
 				<view class="drawer-item" @click="scrollToSection('brand')">
 					<image class="section-image" src="/static/品牌.svg" mode="aspectFit" />
 					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">品牌</text>
+				</view>
+				<view class="drawer-item" @click="jumpToAboutUs">
+					<image class="section-image" src="/static/关于我们.svg" mode="aspectFit" />
+					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">关于我们</text>
 				</view>
 			</scroll-view>
 		</uni-drawer>
@@ -853,6 +857,16 @@
 				window.open('https://beian.miit.gov.cn/', '_blank');
 				// #endif
 			},
+			
+			jumpToAboutUs() {
+				// #ifdef APP-PLUS
+				plus.runtime.openURL('https://mp.weixin.qq.com/s/wJutrO8INBySSj51UOus5A');
+				// #endif
+				
+				// #ifdef H5
+				window.open('https://mp.weixin.qq.com/s/wJutrO8INBySSj51UOus5A', '_blank');
+				// #endif
+			},
 
 			scrollToSection(sectionId) {
 				// Close drawer first
@@ -975,7 +989,6 @@
 
 	.box-bg {
 		background-color: #F5F5F5;
-		padding: 5px 0;
 	}
 
 	.drawer-text {
@@ -1078,7 +1091,7 @@
 	}
 
 	.text-h1 {
-		font-size: 16px;
+		font-size: 14px;
 		font-weight: bold;
 		color: black;
 	}
@@ -1135,8 +1148,10 @@
 		height: 30px;
 	}
 
-	.padding-left {
-		padding-left: 8px;
+	.image-padding-left {
+		width: 14px;
+		height: 14px;
+		padding-left: 1px;
 	}
 
 	.hr-line {
