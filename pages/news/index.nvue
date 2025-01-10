@@ -25,7 +25,7 @@
 						style="align-self: center; height: 40px;" />
 				</view>
 				<view class="drawer-item" @click="scrollToSection('article')" style="margin-top: 20px;">
-					<image class="section-image" src="/static/资讯.png" mode="aspectFit" />
+					<image class="section-image" src="/static/文章.svg" mode="aspectFit" />
 					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">文章</text>
 				</view>
 				<view class="drawer-item" @click="scrollToSection('game')">
@@ -41,7 +41,7 @@
 					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">团体</text>
 				</view>
 				<view class="drawer-item" @click="scrollToSection('brand')">
-					<image class="section-image" src="/static/品牌.png" mode="aspectFit" />
+					<image class="section-image" src="/static/品牌.svg" mode="aspectFit" />
 					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">品牌</text>
 				</view>
 			</scroll-view>
@@ -49,7 +49,7 @@
 		<uni-card id="article" :style="{ margin: '4px' }" title="文章">
 			<template v-slot:title>
 				<view class='section-item'>
-					<image class="section-image" src="/static/资讯.png" mode="aspectFit" />
+					<image class="section-image" src="/static/文章.svg" mode="aspectFit" />
 					<text class="text-h1">文章</text>
 					<view class="section-title-space"></view>
 					<view class="text-h1">优质文章</view>
@@ -171,7 +171,7 @@
 		<uni-card id="brand" :style="{ margin: '4px' }" title="品牌">
 			<template v-slot:title>
 				<view class='section-item'>
-					<image class="section-image" src="/static/品牌.png" mode="aspectFit" />
+					<image class="section-image" src="/static/品牌.svg" mode="aspectFit" />
 					<text class="text-h1">品牌</text>
 					<view class="section-title-space"></view>
 					<picker @change="bindBrandRank2PickerChange" :value="brandRank2Index" :range="brandRank2">
