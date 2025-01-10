@@ -1,5 +1,5 @@
 export default class EntryModel {
-  constructor(entry_id, sport_type, rank1, rank2, rank3, rank4, title, title_eng, brand, icon, link_main, description, add_date, add_author, link_taobao, link_jd, link_wechat, created_at, updated_at, deleted_at, link_redbook, wechat_public) {
+  constructor(entry_id, sport_type, rank1, rank2, rank3, rank4, title, title_eng, brand, icon, link_main, link_public, description, add_date, add_author, link_taobao, link_jd, link_wechat, created_at, updated_at, deleted_at, link_redbook, wechat_public) {
     this.entry_id = entry_id;
     this.sport_type = sport_type;
     this.rank1 = rank1;
@@ -11,6 +11,7 @@ export default class EntryModel {
 	this.brand = brand;
     this.icon = icon;
     this.link_main = link_main;
+	this.link_public = link_public;
     this.description = description;
     this.add_date = add_date;
     this.add_author = add_author;
@@ -38,6 +39,7 @@ export default class EntryModel {
 	  json.brand,
       json.icon,
       json.link_main,
+	  json.link_public,
       json.description,
       json.add_date,
       json.add_author,

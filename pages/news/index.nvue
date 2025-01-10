@@ -522,7 +522,7 @@
 			},
 
 			onClickTeamDetailItem(item) {
-				let url = item.link_main;
+				let url = item.link_public;
 				// #ifdef APP-PLUS
 				plus.runtime.openURL(url);
 				// #endif
@@ -963,6 +963,7 @@
 						statics_detail: detailInfo,
 					}
 				}).then((result) => {
+					console.log("EEEE", result);
 				});
 			},
 		}
