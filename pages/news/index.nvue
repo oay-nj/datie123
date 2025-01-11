@@ -26,7 +26,7 @@
 				</view>
 				<view class="drawer-item" @click="scrollToSection('article')" style="margin-top: 20px;">
 					<image class="section-image" src="/static/文章.svg" mode="aspectFit" />
-					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">文章</text>
+					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">热门推荐</text>
 				</view>
 				<view class="drawer-item" @click="scrollToSection('game')">
 					<image class="section-image" src="/static/比赛.svg" mode="aspectFit" />
@@ -50,34 +50,26 @@
 				</view>
 			</scroll-view>
 		</uni-drawer>
-		<uni-card id="article" :style="{ margin: '4px' }" title="文章">
-			<template v-slot:title>
-				<view class='section-item'>
-					<image class="section-image" src="/static/文章.svg" mode="aspectFit" />
-					<text class="text-h1">文章</text>
-					<view class="section-title-space"></view>
-					<view class="text-h1">优质文章</view>
+		<swiper class="swiper-box" v-if="hotInfoList.length > 0"  :autoplay='true' :circular='true'>
+			<swiper-item v-for="(item, index) in hotInfoList" :key="index">
+				<view class="swiper-item">
+					<image :src="item.bk_image" mode="aspectFit" @click="onClickBanner(item)"></image>
 				</view>
-				<view class="hr-line"></view>
-			</template>
-			<uni-grid :column="2" :showBorder="false" :square="false">
-				<uni-grid-item v-for="(item, index) in articleList" :key="index" @click="onClickDetailItem(item)">
-					<text class="grid-item-title">{{item.title}}</text>
-				</uni-grid-item>
-			</uni-grid>
-		</uni-card>
+			</swiper-item>
+		</swiper>
 		<uni-card id="game" :style="{ margin: '4px' }" title="赛事">
 			<template v-slot:title>
 				<view class='section-item'>
 					<image class="section-image" src="/static/比赛.svg" mode="aspectFit" />
 					<text class="text-h1">赛事</text>
 					<view class="section-title-space"></view>
-					<picker @change="bindGameRank2PickerChange" :value="gameRank2Index" :range="gameRank2">
-						<view class="city">
-							<view class="text-h1">{{gameRank2[gameRank2Index]}}</view>
-							<image class="section-image-drop-down" src="/static/frop-down.svg" mode="aspectFit" />
-						</view>
-					</picker>
+					<view class="rank2-tag-container">
+						<uni-tag class="tag-padding" v-for="(tag, index) in gameRank2" :key="index" :text="tag"
+							:custom-style="index === gameRank2Index ? 
+						'background-color: #FBE7E9; border: none; font-size:14px; color: #CE2C32' : 
+						'background-color: #EFEFEF; border: none; font-size:14px; color: #333333'" @click="bindGameRank2PickerChange(index)">
+						</uni-tag>
+					</view>
 				</view>
 				<view class="hr-line"></view>
 				<horizontalScroller :tabs="gameRank3" @tab-change="handleGameRank3Selected"></horizontalScroller>
@@ -108,12 +100,13 @@
 					<image class="section-image" src="/static/装备.svg" mode="aspectFit" />
 					<text class="text-h1">装备</text>
 					<view class="section-title-space"></view>
-					<picker @change="bindGearRank2PickerChange" :value="gearRank2Index" :range="gearRank2">
-						<view class="city">
-							<view class="text-h1">{{gearRank2[gearRank2Index]}}</view>
-							<image class="section-image-drop-down" src="/static/frop-down.svg" mode="aspectFit" />
-						</view>
-					</picker>
+					<view class="rank2-tag-container">
+						<uni-tag class="tag-padding" v-for="(tag, index) in gearRank2" :key="index" :text="tag"
+							:custom-style="index === gearRank2Index ? 
+						'background-color: #FBE7E9; border: none; font-size:14px; color: #CE2C32' : 
+						'background-color: #EFEFEF; border: none; font-size:14px; color: #333333'" @click="bindGearRank2PickerChange(index)">
+						</uni-tag>
+					</view>
 				</view>
 				<view class="hr-line"></view>
 				<horizontalScroller :tabs="gearRank3" @tab-change="handleGearRank3Selected"></horizontalScroller>
@@ -145,15 +138,17 @@
 					<image class="section-image" src="/static/团队.svg" mode="aspectFit" />
 					<text class="text-h1">团体</text>
 					<view class="section-title-space"></view>
-					<picker @change="bindTeamRank2PickerChange" :value="teamRank2Index" :range="teamRank2">
-						<view class="city">
-							<view class="text-h1">{{teamRank2[teamRank2Index]}}</view>
-							<image class="section-image-drop-down" src="/static/frop-down.svg" mode="aspectFit" />
-						</view>
-					</picker>
+					<view class="rank2-tag-container">
+						<uni-tag class="tag-padding" v-for="(tag, index) in teamRank2" :key="index" :text="tag"
+							:custom-style="index === teamRank2Index ? 
+						'background-color: #FBE7E9; border: none; font-size:14px; color: #CE2C32' : 
+						'background-color: #EFEFEF; border: none; font-size:14px; color: #333333'" @click="bindTeamRank2PickerChange(index)">
+						</uni-tag>
+					</view>
 				</view>
 				<view class="hr-line"></view>
-				<horizontalScroller v-if="teamRank3.length > 0" :tabs="teamRank3" @tab-change="handleTeamRank3Selected"></horizontalScroller>
+				<horizontalScroller v-if="teamRank3.length > 0" :tabs="teamRank3" @tab-change="handleTeamRank3Selected">
+				</horizontalScroller>
 				<view class="tag-container">
 					<uni-tag class="tag-padding" v-for="(tag, index) in teamRank4" :key="index" :text="tag"
 						:custom-style="tag === teamRank4selected ? 
@@ -166,7 +161,8 @@
 				<uni-grid-item v-for="(item, index) in filterTeamList" :key="index"
 					@click="onClickTeamDetailItem(item)">
 					<view class="city">
-						<image :src="item.icon" mode="aspectFit" style="width: 32px; height: 32px; padding-right: 5px;"></image>
+						<image :src="item.icon" mode="aspectFit" style="width: 32px; height: 32px; padding-right: 5px;">
+						</image>
 						<text class="grid-item-title" style="width: 135px; height: 32px;">{{item.title}}</text>
 					</view>
 				</uni-grid-item>
@@ -178,12 +174,13 @@
 					<image class="section-image" src="/static/品牌.svg" mode="aspectFit" />
 					<text class="text-h1">品牌</text>
 					<view class="section-title-space"></view>
-					<picker @change="bindBrandRank2PickerChange" :value="brandRank2Index" :range="brandRank2">
-						<view class="city">
-							<view class="text-h1">{{brandRank2[brandRank2Index]}}</view>
-							<image class="section-image-drop-down" src="/static/frop-down.svg" mode="aspectFit" />
-						</view>
-					</picker>
+					<view class="rank2-tag-container">
+						<uni-tag class="tag-padding" v-for="(tag, index) in brandRank2" :key="index" :text="tag"
+							:custom-style="index === brandRank2Index ? 
+						'background-color: #FBE7E9; border: none; font-size:14px; color: #CE2C32' : 
+						'background-color: #EFEFEF; border: none; font-size:14px; color: #333333'" @click="bindBrandRank2PickerChange(index)">
+						</uni-tag>
+					</view>
 				</view>
 				<view class="hr-line"></view>
 				<horizontalScroller :tabs="brandRank3" @tab-change="handleBrandRank3Selected"></horizontalScroller>
@@ -199,7 +196,8 @@
 				<uni-grid-item v-for="(item, index) in filterBrandList" :key="index"
 					@click="onClickBrandDetailItem(item)">
 					<view class="cell-card">
-						<image :src="item.icon" mode="aspectFit" style="width: 48px; height: 48px; padding-bottom: 4px;"></image>
+						<image :src="item.icon" mode="aspectFit"
+							style="width: 48px; height: 48px; padding-bottom: 4px;"></image>
 						<text class="grid-item-title-brand">{{item.title}}</text>
 					</view>
 				</uni-grid-item>
@@ -305,7 +303,7 @@
 					type: '铁人三项'
 				}],
 				typeIndex: 0,
-				articleList: [],
+				hotInfoList: [],
 
 				gameHierarchy: {},
 				gameRank2: [],
@@ -349,7 +347,7 @@
 			this.queryGearDicList();
 			this.queryTeamDicList();
 			this.queryBrandDicList();
-			this.queryArticleList();
+			this.queryHotInfoList();
 			// this.queryData();
 			// this.queryTrainData();
 		},
@@ -365,8 +363,8 @@
 				// this.typeIndex = e.detail.value
 				// this.queryData();
 			},
-			bindGameRank2PickerChange: function(e) {
-				this.gameRank2Index = e.detail.value
+			bindGameRank2PickerChange(index) {
+				this.gameRank2Index = index;
 				let rank2Cur = this.gameRank2[this.gameRank2Index];
 				if (rank2Cur != undefined) {
 					let rank22 = this.getRank2Sublist(this.gameHierarchy, "赛事", rank2Cur);
@@ -378,8 +376,8 @@
 				}
 				this.queryGameData();
 			},
-			bindGearRank2PickerChange: function(e) {
-				this.gearRank2Index = e.detail.value
+			bindGearRank2PickerChange(index) {
+				this.gearRank2Index = index;
 				let rank2Cur = this.gearRank2[this.gearRank2Index];
 				if (rank2Cur != undefined) {
 					let rank22 = this.getRank2Sublist(this.gearHierarchy, "装备", rank2Cur);
@@ -391,8 +389,8 @@
 				}
 				this.queryGearData();
 			},
-			bindTeamRank2PickerChange: function(e) {
-				this.teamRank2Index = e.detail.value
+			bindTeamRank2PickerChange(index) {
+				this.teamRank2Index = index;
 				let rank2Cur = this.teamRank2[this.teamRank2Index];
 				if (rank2Cur != undefined) {
 					let rank22 = this.getRank2Sublist(this.teamHierarchy, "团体", rank2Cur);
@@ -404,8 +402,8 @@
 				}
 				this.queryTeamData();
 			},
-			bindBrandRank2PickerChange: function(e) {
-				this.brandRank2Index = e.detail.value
+			bindBrandRank2PickerChange(index) {
+				this.brandRank2Index = index;
 				let rank2Cur = this.brandRank2[this.brandRank2Index];
 				if (rank2Cur != undefined) {
 					let rank22 = this.getRank2Sublist(this.brandHierarchy, "品牌", rank2Cur);
@@ -463,6 +461,18 @@
 				this.brandRank4 = rank33;
 				this.brandRank4selected = rank33[0] || "";
 				this.queryBrandData();
+			},
+			
+			onClickBanner(item) {
+				let url = item.link_main;
+				// #ifdef APP-PLUS
+				plus.runtime.openURL(url);
+				// #endif
+				
+				// #ifdef H5
+				window.open(url, '_blank');
+				// #endif
+				this.addSingleStaticsDetail(item);
 			},
 
 			onClickDetailItem(item) {
@@ -549,16 +559,17 @@
 				this.addSingleStaticsDetail(item);
 			},
 
-			queryArticleList() {
+			queryHotInfoList() {
 				let sportType = "铁人三项";
 				uni.request({
 					url: 'https://datie123.com/entry/getEntryList',
 					method: 'GET',
 					data: {
 						sport_type: sportType,
-						rank1: "文章",
+						rank1: "热门推荐",
 					}
 				}).then((result) => {
+					console.log("EE", result);
 					if (result.statusCode === 200) {
 						// 成功处理
 						let resList = [];
@@ -570,7 +581,7 @@
 								resList.push(entry);
 							}
 						}
-						this.articleList = resList;
+						this.hotInfoList = resList;
 					}
 				});
 			},
@@ -857,12 +868,12 @@
 				window.open('https://beian.miit.gov.cn/', '_blank');
 				// #endif
 			},
-			
+
 			jumpToAboutUs() {
 				// #ifdef APP-PLUS
 				plus.runtime.openURL('https://mp.weixin.qq.com/s/wJutrO8INBySSj51UOus5A');
 				// #endif
-				
+
 				// #ifdef H5
 				window.open('https://mp.weixin.qq.com/s/wJutrO8INBySSj51UOus5A', '_blank');
 				// #endif
@@ -962,13 +973,13 @@
 					}
 				});
 			},
-			
+
 			addSingleStaticsDetail(item) {
 				const currentTime = new Date().toString();
 				let detailInfo = {
 					entry_id: item.entry_id,
 					element_id: item.id,
-					click_time:currentTime
+					click_time: currentTime
 				}
 				uni.request({
 					url: 'https://datie123.com/entry/addSingleStaticsDetail',
@@ -1009,7 +1020,7 @@
 		text-overflow: ellipsis;
 		padding-right: 18px;
 	}
-	
+
 	.grid-item-title-brand {
 		width: 60px;
 		height: 42px;
@@ -1021,7 +1032,8 @@
 		padding-right: 18px;
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 2; /* 限制为两行 */
+		-webkit-line-clamp: 2;
+		/* 限制为两行 */
 	}
 
 	.grid-item-sub-title {
@@ -1115,7 +1127,7 @@
 		align-items: center;
 		justify-content: flex-start;
 	}
-	
+
 	.cell-card {
 		/* #ifndef APP-PLUS-NVUE */
 		display: flex;
@@ -1128,6 +1140,15 @@
 		/* #endif */
 		flex-direction: row;
 		margin-top: 8px;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.rank2-tag-container {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: row;
 		align-items: center;
 		justify-content: center;
 	}
@@ -1201,5 +1222,19 @@
 		color: #999;
 		text-decoration: none;
 		/* 取消下划线 */
+	}
+
+	.swiper-box {
+		height: 100px;
+	}
+
+	.swiper-item {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		height: 100px;
 	}
 </style>
