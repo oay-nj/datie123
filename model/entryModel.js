@@ -1,5 +1,5 @@
 export default class EntryModel {
-  constructor(entry_id, sport_type, rank1, rank2, rank3, rank4, title, title_eng, brand, icon, bk_image, link_main, link_public, description, add_date, add_author, link_taobao, link_jd, link_wechat, created_at, updated_at, deleted_at, link_redbook, wechat_public) {
+  constructor(entry_id, sport_type, rank1, rank2, rank3, rank4, title, title_eng, brand, icon, bk_image, link_main, link_public, description, add_date, add_author, link_taobao, link_jd, link_wechat, created_at, updated_at, deleted_at, link_redbook, wechat_public, race_date, area, new_yn) {
     this.entry_id = entry_id;
     this.sport_type = sport_type;
     this.rank1 = rank1;
@@ -24,6 +24,9 @@ export default class EntryModel {
     this.deleted_at = deleted_at;
     this.link_redbook = link_redbook;
     this.wechat_public = wechat_public;
+	this.race_date = race_date || '';
+	this.area = area || '';
+	this.new_yn = new_yn;
   }
 
   // 静态方法，从JSON对象创建Entry实例
@@ -52,7 +55,10 @@ export default class EntryModel {
       json.updated_at,
       json.deleted_at,
       json.link_redbook,
-      json.wechat_public
+      json.wechat_public,
+	  json.race_date,
+	  json.area,
+	  json.new_yn
     );
   }
 }

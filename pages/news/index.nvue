@@ -2,7 +2,7 @@
 	<view class="box-bg">
 		<uni-nav-bar shadow :border="false" fixed>
 			<template v-slot:left>
-				<view class="city" @click="showDrawer">
+				<view class="row_style" @click="showDrawer">
 					<image class="navi-left-image" src="/static/meun.svg" mode="aspectFit" />
 				</view>
 			</template>
@@ -10,7 +10,7 @@
 				<image class="input-view" src="/static/DT-logo_color.png" mode="aspectFit" />
 			</view>
 			<template v-slot:right>
-				<view class="city">
+				<view class="row_style">
 					<picker @change="bindPickerChange" :value="typeIndex" :range="array" range-key="type">
 						<view class="text-h1">{{array[typeIndex].type}}</view>
 					</picker>
@@ -83,12 +83,12 @@
 			</template>
 			<uni-grid :column="2" :showBorder="false" :square="false">
 				<uni-grid-item v-for="(item, index) in filterGameList" :key="index" @click="onClickDetailItem(item)">
-					<view class="city" style="padding-top: 6px">
+					<view class="row_style" style="padding-top: 6px">
 						<image :src="item.icon" mode="aspectFit"
 							style="width: 40px; height: 40px; padding-right: 5px; flex-shrink: 0;"></image>
 						<view style="flex: 1; overflow: hidden;">
 							<text class="grid-item-title" style="height: 18px;">{{item.title}}</text>
-							<text class="grid-item-sub-title" style="height: 18px;">{{item.title_eng}}</text>
+							<text class="grid-item-sub-title" style="height: 18px;">{{item.race_date+ ' ' + item.area}}</text>
 						</view>
 					</view>
 				</uni-grid-item>
@@ -121,12 +121,15 @@
 			<uni-grid :column="2" :showBorder="false" :square="false">
 				<uni-grid-item v-for="(item, index) in filterGearList" :key="index"
 					@click="onClickGearDetailItem(item)">
-					<view class="city" style="padding-top: 6px">
+					<view class="row_style" style="padding-top: 6px">
 						<image :src="item.icon" mode="aspectFit"
 							style="width: 40px; height: 40px; padding-right: 5px; flex-shrink: 0;"></image>
 						<view style="flex: 1; overflow: hidden;">
-							<text class="grid-item-title" style="height: 18px;">{{item.brand}}</text>
-							<text class="grid-item-sub-title" style="height: 18px;">{{item.title}}</text>
+							<view class="row_style" style="height: 18px;">
+								<text class="grid-item-title" style="padding-right: 0px;">{{item.title}}</text>
+								<image v-if="item.new_yn == 1" class="new-badge-image" src="/static/new.svg" mode="aspectFit" />
+							</view>
+							<text class="grid-item-sub-title" style="height: 18px;">{{item.brand}}</text>
 						</view>
 					</view>
 				</uni-grid-item>
@@ -160,7 +163,7 @@
 			<uni-grid :column="2" :showBorder="false" :square="false">
 				<uni-grid-item v-for="(item, index) in filterTeamList" :key="index"
 					@click="onClickTeamDetailItem(item)">
-					<view class="city">
+					<view class="row_style">
 						<image :src="item.icon" mode="aspectFit" style="width: 32px; height: 32px; padding-right: 5px;">
 						</image>
 						<text class="grid-item-title" style="width: 135px; height: 32px;">{{item.title}}</text>
@@ -1119,7 +1122,7 @@
 		width: 22px;
 	}
 
-	.city {
+	.row_style {
 		/* #ifndef APP-PLUS-NVUE */
 		display: flex;
 		/* #endif */
@@ -1151,6 +1154,14 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
+	}
+	
+	.new-badge-image {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		width: 20px;
+		height: 20px;
 	}
 
 	.section-image {
