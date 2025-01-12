@@ -57,7 +57,7 @@
 				</view>
 			</swiper-item>
 		</swiper>
-		<uni-card id="game" :style="{ margin: '4px' }" title="赛事">
+		<uni-card id="game" :style="{margin: '4px', padding: '10px 0px 10px 10px'}" title="赛事">
 			<template v-slot:title>
 				<view class='section-item'>
 					<image class="section-image" src="/static/比赛.svg" mode="aspectFit" />
@@ -135,7 +135,7 @@
 				</uni-grid-item>
 			</uni-grid>
 		</uni-card>
-		<uni-card id="team" :style="{ margin: '4px' }" title="团体">
+		<uni-card id="team" :style="{margin: '4px', padding: '10px 0px 10px 10px'}" title="团体">
 			<template v-slot:title>
 				<view class='section-item'>
 					<image class="section-image" src="/static/团队.svg" mode="aspectFit" />
@@ -166,7 +166,7 @@
 					<view class="row_style">
 						<image :src="item.icon" mode="aspectFit" style="width: 32px; height: 32px; padding-right: 5px;">
 						</image>
-						<text class="grid-item-title" style="width: 135px; height: 32px;">{{item.title}}</text>
+						<text class="grid-item-title">{{item.title}}</text>
 					</view>
 				</uni-grid-item>
 			</uni-grid>
@@ -1021,7 +1021,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		padding-right: 18px;
+		padding-right: 6px;
 	}
 
 	.grid-item-title-brand {
@@ -1032,7 +1032,7 @@
 		color: #333333;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		padding-right: 18px;
+		padding-right: 6px;
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 2;
@@ -1045,7 +1045,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		padding-right: 18px;
+		padding-right: 6px;
 	}
 
 	.tag-sub-padding {
@@ -1135,6 +1135,7 @@
 		/* #ifndef APP-PLUS-NVUE */
 		display: flex;
 		/* #endif */
+		align-items: center;
 	}
 
 	.tag-container {
