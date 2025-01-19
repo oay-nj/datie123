@@ -1,5 +1,5 @@
 <template>
-	<view class="box-bg">
+	<view class="box-bg" id="top">
 		<uni-nav-bar shadow :border="false" fixed>
 			<template v-slot:left>
 				<view class="row_style" @click="showDrawer">
@@ -25,7 +25,7 @@
 						style="align-self: center; height: 40px;" />
 				</view>
 				<view class="drawer-item" @click="scrollToSection('article')" style="margin-top: 20px;">
-					<image class="section-image" src="/static/文章.svg" mode="aspectFit" />
+					<image class="section-image" src="/static/热门推荐.svg" mode="aspectFit" />
 					<text class="drawer-text" style="font-size: 18px; font-weight: bold;">热门推荐</text>
 				</view>
 				<view class="drawer-item" @click="scrollToSection('game')">
@@ -50,10 +50,10 @@
 				</view>
 			</scroll-view>
 		</uni-drawer>
-		<swiper class="swiper-box" v-if="hotInfoList.length > 0"  :autoplay='true' :circular='true'>
+		<swiper id="article" class="swiper-box" v-if="hotInfoList.length > 0"  :autoplay='true' :circular='true'>
 			<swiper-item v-for="(item, index) in hotInfoList" :key="index">
 				<view class="swiper-item">
-					<image :src="item.bk_image" mode="aspectFit" @click="onClickBanner(item)"></image>
+					<image :src="item.bk_image" class="swiper-item-img" mode="aspectFill" @click="onClickBanner(item)"></image>
 				</view>
 			</swiper-item>
 		</swiper>
@@ -209,6 +209,9 @@
 		<view class="beian-container">
 			<text class="beian-text" @click="openBeianLink">备案号：苏ICP备2022016640号-3</text>
 		</view>
+	</view>
+	<view class="back-to-top" @click="scrollToTop">
+	    <image src="/static/返回顶部.svg" mode="widthFix" class="icon"></image>
 	</view>
 </template>
 
@@ -539,14 +542,37 @@
 			},
 
 			onClickTeamDetailItem(item) {
-				let url = item.link_public;
-				// #ifdef APP-PLUS
-				plus.runtime.openURL(url);
-				// #endif
-
-				// #ifdef H5
-				window.open(url, '_blank');
-				// #endif
+				const mainUrl = item.link_main || "";
+				const wxUrl = item.wechat_public || "";
+								
+				if (mainUrl.length > 0 && wxUrl.length > 0) {
+					const itemList = ["团体介绍", "微信公众号"];
+					uni.showActionSheet({
+						itemList,
+						success: (res) => {
+							let url = '';
+							if (res.tapIndex === 0) {
+								url = mainUrl;
+							} else {
+								url = wxUrl;
+							}
+							// #ifdef APP-PLUS
+							plus.runtime.openURL(url);
+							// #endif
+							// #ifdef H5
+							window.open(url, '_blank');
+							// #endif
+						}
+					});
+				} else {
+					const url = mainUrl || wxUrl;
+					// #ifdef APP-PLUS
+					plus.runtime.openURL(url);
+					// #endif
+					// #ifdef H5
+					window.open(url, '_blank');
+					// #endif
+				}
 				this.addSingleStaticsDetail(item);
 			},
 
@@ -880,6 +906,10 @@
 				// #ifdef H5
 				window.open('https://mp.weixin.qq.com/s/wJutrO8INBySSj51UOus5A', '_blank');
 				// #endif
+			},
+			
+			scrollToTop() {
+				this.scrollToSection("top")
 			},
 
 			scrollToSection(sectionId) {
@@ -1237,16 +1267,39 @@
 	}
 
 	.swiper-box {
-		height: 100px;
+		width: 100%;
+		display: flex;
+		height: calc(100vw * 100 / 393); /* 动态计算高度 */
 	}
 
 	.swiper-item {
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		height: 100px;
+		flex: 1;
+	}
+	
+	.swiper-item-img {
+		width: 100%;
+		height: 100%;
+		pointer-events: none; /* 禁止图片交互 */
+	}
+	
+	/* 返回顶部图标样式 */
+	.back-to-top {
+	  position: fixed;
+	  right: 20px;
+	  bottom: 20px;
+	  width: 40px;
+	  height: 40px;
+	  background-color: #33333311;
+	  border-radius: 50%;
+	  border-width: 1px;
+	  border-color: #E8E2E2;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  z-index: 999;
+	  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* 添加阴影效果 */
 	}
 </style>

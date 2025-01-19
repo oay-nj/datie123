@@ -1,7 +1,9 @@
 {
   "pages": [{
       "path": "pages/news/index",
-      "style": {}
+      "style": {
+		  "enablePullDownRefresh": true
+	  }	
     },
     {
       "path": "pages/news/detail",
