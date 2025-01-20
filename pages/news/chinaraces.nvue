@@ -1,0 +1,1080 @@
+<template>
+    <view class="box-bg">
+        <uni-nav-bar shadow :border="false" fixed>
+            <template v-slot:left>
+                <view class="row_style" @click="goHome">
+                    <image class="navi-left-image home-icon" src="/static/home.svg" mode="aspectFit"
+                    />
+                </view>
+            </template>
+            <view class="home-icon-bg">
+                <image class="input-view" src="/static/racesbar.png" mode="aspectFit"
+                />
+            </view>
+            <template v-slot:right>
+                <button class="share-button" @click="handleShare" v-if="!isWeChatEnvironment">
+                    <image class="navi-left-image home-icon" src="/static/share.svg" mode="aspectFit">
+                    </image>
+                </button>
+            </template>
+        </uni-nav-bar>
+		<scroll-view class="content-scroll" scroll-y enable-pull-down-refresh @refresherrefresh="handlePullDownRefresh" :style="{ minHeight: '100px' }">
+			<div class="filter-row" >
+				<view class="filter-item" >
+					<view @click="toggleDropdown('Region')"
+						  class="picker-text">
+						{{ selectedRegion || '地区' }}
+					</view>
+					<view v-if="showPickerRegion" class="dropdown">
+						<view 
+							v-for="(option, index) in regions" 
+							:key="index" 
+							@click="selectOptionRegion(option)" 
+							class="dropdown-item"
+							:style="{ color: option === selectedRegion ? 'blue' : '' }"
+						>
+							{{ option }}
+						</view>
+					</view>
+				</view>
+				<view class="filter-item2">
+					<view @click="toggleDropdown('Status')" class="picker-text">
+						{{ selectedStatus || '赛事状态' }}
+					</view>
+					<view v-if="showPickerStatus" class="dropdown">
+						<view 
+							v-for="(option, index) in statuses" 
+							:key="index" 
+							@click="selectOptionStatus(option)" 
+							class="dropdown-item"
+							:style="{ color: option === selectedStatus ? 'blue' : '' }"
+						>
+							{{ option }}
+						</view>
+					</view>
+				</view>
+				<view class="filter-item3">
+					<view @click="toggleDropdown('Month')" class="picker-text">
+						{{ selectedMonth || '月份' }}
+					</view>
+					<view v-if="showPickerMonth" class="dropdown">
+						<view 
+							v-for="(option, index) in months" 
+							:key="index" 
+							@click="selectOptionMonth(option)" 
+							class="dropdown-item"
+							:style="{ color: option === selectedMonth ? 'blue' : '' }"
+						>
+							{{ option }}
+						</view>
+					</view>
+				</view>
+				<view class="filter-item4">
+					<view @click="toggleDropdown('Distance')" class="picker-text">
+						{{ selectedDistance || '距离' }}
+					</view>
+					<view v-if="showPickerDistance" class="dropdown">
+						<view 
+							v-for="(option, index) in distances" 
+							:key="index" 
+							@click="selectOptionDistance(option)" 
+							class="dropdown-item"
+							:style="{ color: option === selectedDistance ? 'blue' : '' }"
+						>
+							{{ option }}
+						</view>
+					</view>
+				</view>		
+			</div>
+		<div class="races-container">
+		  <div v-for="(race, index) in races" :key="index" class="race-item"
+		       :style="{ backgroundImage: `url(${race.bk_image})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
+		       @click="openRaceLink(race.link_main)">
+		    <!-- 遮罩层 -->
+		    <div class="overlay"></div>
+		
+		    <!-- 内容 -->
+		    <div class="content">
+		      <div class="title">
+		        {{ race.title }}
+		      </div>
+		      <div class="race-details">
+		        <div class="detail-left">
+		          <img :src="race.icon" alt="icon" class="race-icon" draggable="false"/>
+		        </div>
+		        <div class="detail-right">
+		          <div class="top-row">
+		            <div class="top-row-text">
+		              {{ `${race.area} · ${race.rank4}` }}
+		            </div>
+		          </div>
+		          <div class="bottom-row">
+		            <div class="bottom-row-text">
+		              {{ race.race_date ? race.race_date : '敬请期待' }}
+		            </div>
+		            <div class="bottom-row-text2">
+		              {{ race.race_status }}
+		            </div>
+		          </div>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		</div>	
+		</scroll-view>
+		<view class="beian-container">
+			<text class="beian-text" @click="openBeianLink">备案号：苏ICP备2022016640号-3</text>
+		</view>
+	</view>
+</template>
+
+<script >
+export default {
+	
+	data() {
+		return {
+		  regions: [], // 地区
+		  statuses: [], // 赛事状态
+		  months: this.generateMonths(),
+		  distances: [] ,// 距离
+		
+		  selectedRegion: '', // 保存选中的地区
+		  selectedStatus: '', // 保存选中的赛事状态
+		  selectedMonth: '', // 保存选中的月份
+		  selectedDistance: '' ,// 保存选中的距离
+		   
+		  races: [] ,// 存储赛事数据，
+		  
+		  isWeChat: false, // 标记是否为微信环境
+		  // 微信分享的配置
+		  appId: "",        // 从后端获取的 appId
+		  timestamp: "",    // 从后端获取的 timestamp
+		  nonceStr: "",     // 从后端获取的 nonceStr
+		  signature: "",    // 从后端获取的 signature
+		  shareTitle: "打铁123",
+		  shareDesc: "打铁从这里开始",
+		  shareLink: "https://www.datie123.com",
+		  // shareImage: "https://www.datie123.com/share-image.jpg"
+		  
+		  loading: false, // 加载状态
+		  isWeChatEnvironment: false, // 初始状态，默认不是微信环境
+		  
+		  showPickerRegion: false,
+		  showPickerStatus: false,
+		  showPickerMonth: false,
+		  showPickerDistance: false,
+		};
+	  },
+	  onPullDownRefresh() {
+	      console.log('页面级下拉刷新被触发');
+	      this.handlePullDownRefresh();
+	    },
+	methods: {
+		
+		// 切换下拉菜单显示/隐藏
+		      toggleDropdown(type) {
+		        switch (type) {
+		          case 'Region':
+		            this.showPickerRegion = !this.showPickerRegion;
+		            this.showPickerStatus = false;
+		            this.showPickerMonth = false;
+		            this.showPickerDistance = false;
+		            break;
+		          case 'Status':
+		            this.showPickerStatus = !this.showPickerStatus;
+		            this.showPickerRegion = false;
+		            this.showPickerMonth = false;
+		            this.showPickerDistance = false;
+		            break;
+		          case 'Month':
+		            this.showPickerMonth = !this.showPickerMonth;
+		            this.showPickerRegion = false;
+		            this.showPickerStatus = false;
+		            this.showPickerDistance = false;
+		            break;
+		          case 'Distance':
+		            this.showPickerDistance = !this.showPickerDistance;
+		            this.showPickerRegion = false;
+		            this.showPickerStatus = false;
+		            this.showPickerMonth = false;
+		            break;
+		        }
+		      },
+		selectOptionRegion(option) {		
+			if (option === '全部') {
+			  this.selectedRegion = ''; // 选择“全部”时，清空选中值，显示默认文本
+			} else {
+			  this.selectedRegion = option;
+			}
+			this.showPickerRegion = false;
+			// console.error(this.selectedRegion)
+			this.fetchRaceData();
+		},
+		selectOptionStatus(option) {
+			if (option === '全部') {
+			  this.selectedStatus = ''; // 选择“全部”时，清空选中值，显示默认文本
+			} else {
+			  this.selectedStatus = option;
+			}
+			this.showPickerStatus = false;
+			// console.error(this.selectedRegion)
+			this.fetchRaceData();
+		},
+		selectOptionMonth(option) {
+			if (option === '全部') {
+			  this.selectedMonth = ''; // 选择“全部”时，清空选中值，显示默认文本
+			} else {
+			  this.selectedMonth = option;
+			}
+			this.showPickerMonth = false;
+			// console.error(this.selectedRegion)
+			this.fetchRaceData();
+		},
+		selectOptionDistance(option) {
+			if (option === '全部') {
+			  this.selectedDistance = ''; // 选择“全部”时，清空选中值，显示默认文本
+			} else {
+			  this.selectedDistance = option;
+			}
+			this.showPickerDistance = false;
+			// console.error(this.selectedRegion)
+			this.fetchRaceData();
+		},
+		handlePullDownRefresh() {
+		      try {
+		        // 模拟异步请求
+		        this.fetchRaceData();
+				uni.stopPullDownRefresh();
+				uni.showToast({
+				  title: '刷新成功',  
+				  icon: 'success'
+				});
+			  }catch (error) {
+		        console.error('刷新时发生错误:', error);
+				uni.stopPullDownRefresh();
+		        uni.showToast({
+		          title: '刷新失败',
+		          icon: 'none'
+		        });		        
+		      }
+			  finally{
+				  uni.stopPullDownRefresh();
+			  }
+		    },
+	    generateMonths() {
+			const months = ['全部'];
+			const now = new Date(); // 获取当前日期
+	  
+			for (let i = 0; i < 12; i++) {
+			  const date = new Date(now.getFullYear(), now.getMonth() + i, 1); // 创建新日期对象
+			  const year = date.getFullYear();
+			  const month = String(date.getMonth() + 1).padStart(2, '0'); // 获取月份并确保两位数
+			  months.push(`${year}-${month}`); // 格式化为 "YYYY 年 MM 月"
+			}
+  
+			return months;
+		},
+		openBeianLink() {
+		  const beianUrl = 'https://beian.miit.gov.cn/';
+		  // #ifdef APP-PLUS
+		  plus.runtime.openURL(beianUrl);
+		  // #endif
+
+		  // #ifdef H5
+		  window.location.href = beianUrl;
+		  // #endif
+		},
+		goHome() {
+		  // 根据你的路由配置调整此方法
+		  this.$router.push({ path: '/' }); // 或者使用其他方式导航到首页
+		},
+		openBeianLink() {
+		  const beianUrl = 'https://beian.miit.gov.cn/';
+		  // #ifdef APP-PLUS
+		  plus.runtime.openURL(beianUrl);
+		  // #endif
+		
+		  // #ifdef H5
+		  window.location.href = beianUrl;
+		  // #endif
+		},
+		onRegionChange(e) {
+		  this.selectedRegion = this.regions[e.detail.value];
+		  this.selectedRegion = e.detail.value === 0 ? '' : this.regions[e.detail.value - 1];
+		  // console.error(this.selectedRegion)
+		  this.fetchRaceData();
+		},
+		onStatusChange(e) {
+		  this.selectedStatus = this.statuses[e.detail.value];
+		  this.selectedStatus = e.detail.value === 0 ? '' : this.statuses[e.detail.value - 1];
+		  this.fetchRaceData();
+		},
+		onMonthChange(e) {
+		  this.selectedMonth = this.months[e.detail.value];
+		  this.selectedMonth = e.detail.value === 0 ? '' : this.months[e.detail.value - 1];
+		  this.fetchRaceData();
+		},
+		onDistanceChange(e) {
+		  this.selectedDistance = this.distances[e.detail.value];
+		  this.selectedDistance = e.detail.value === 0 ? '' : this.distances[e.detail.value - 1];
+		  this.fetchRaceData();
+		},
+		fetchRaceData() {
+	      uni.request({
+	        url: 'https://www.datie123.com/entry/getRaces', // API URL
+	        method: 'GET',
+			data: {
+				
+					area: this.selectedRegion,
+					race_status: this.selectedStatus,
+					month: this.selectedMonth,
+					rank4: this.selectedDistance,
+	
+			},
+	        success: (res) => {
+	          if (res.statusCode === 200 && res.data) {
+	            const { areas, race_statuses, monthes, ranks4 ,races} = res.data;
+				this.races = races; // 保存赛事信息	
+	          } else {
+	            console.error('API request failed:', res);
+	          }
+	        },
+	        fail: (err) => {
+	          console.error('Failed to fetch race data:', err);
+	        }
+	      });
+	    },
+		fetchRaceDatanit() {
+		  uni.request({
+			url: 'https://www.datie123.com/entry/getRaces', // API URL
+			method: 'GET',
+			data: {
+				area: this.selectedRegion,
+				// race_status: '报名中',
+				month: this.selectedMonth,
+				rank4: this.selectedDistance,
+			},
+			success: (res) => {
+			  if (res.statusCode === 200 && res.data) {
+				const { areas, race_statuses, monthes, ranks4,races } = res.data;
+				this.races = races; // 保存赛事信息
+				// 更新组件的状态
+				this.regions = ['全部', ...areas];
+				this.statuses = ['全部', ...race_statuses];
+				this.distances = ['全部', ...ranks4];
+				const defaultStatus = '报名中';
+				  this.selectedStatus = defaultStatus;
+			  } else {
+				console.error('API request failed:', res);
+			  }
+			},
+			fail: (err) => {
+			  console.error('Failed to fetch race data:', err);
+			}
+		  });
+		},
+		loadWeChatSDK() {
+			const script = document.createElement('script');
+			script.src = 'https://res.wx.qq.com/open/js/jweixin-1.6.0.js';
+			script.onload = () => {
+				if (typeof wx !== 'undefined') {
+					// callback();
+					// console.error(typeof wx);
+				} else {
+					console.error('微信JS-SDK加载失败');
+				}
+			};
+			document.head.appendChild(script);
+			// 获取当前网页的URL，不包含#及其后面部分
+			const url1 = encodeURIComponent(window.location.href.split('#')[0]);
+			// const url = 'https://www.datie123.com';
+			// console.error('当前 URL:', url1);
+			// 调用后端API获取签名等信息
+			uni.request({
+				url: 'https://www.datie123.com/entry/getShareConfig?url=' + url1, // 替换为你的后端API地址
+				method: 'GET',
+				success: (res) => {
+				if (res.statusCode === 200 && res.data) {
+				this.configData = res.data;
+				
+				this.initWeChatSDK();
+				} else {
+				console.error('获取微信JS-SDK配置失败:', res);
+			  }
+			},
+			fail: (error) => {
+			  console.error('请求微信JS-SDK配置失败:', error);
+			}
+		  });
+		},
+		initWeChatSDK() {		
+			// console.error('获取到的配置数据:', this.configData);
+			// console.error('获取到的配置数据:', JSON.stringify(this.configData, null, 2));
+			  wx.config({
+				debug: false, // 开启调试模式
+				appId: this.configData.appId, // 必填，公众号的唯一标识
+				timestamp: this.configData.timestamp, // 必填，生成签名的时间戳
+				nonceStr: this.configData.nonceStr, // 必填，生成签名的随机串
+				signature: this.configData.signature, // 必填，签名
+				jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData'] // 必填，需要使用的JS接口列表
+			  });	
+			wx.ready(() => {
+			  // console.log('微信JS-SDK加载成功');
+			  this.initWeChatShare();
+			});  
+			wx.error((res) => {
+			  console.error('微信 JS SDK 配置失败:', res);		  
+			});
+		},
+		initWeChatShare() {
+		  const shareData = {
+			title: '2025国内铁三赛事', // 分享标题
+			desc: '提供最新国内铁人三项赛事信息', // 分享描述
+			link: 'www.datie123.com', // 分享链接
+			imgUrl: 'datie123-1253566288.cos.ap-shanghai.myqcloud.com/uploads/datie123icon/202501/login-banner_250118175642.jpg', // 分享图标		
+		  };		
+			  wx.updateAppMessageShareData({
+				...shareData,
+				success: () => {
+				  console.log('设置给朋友分享的数据成功');
+				},
+				fail: (err) => {
+				  console.error('设置给朋友分享的数据失败:', err);
+				}
+			  });
+			
+			  // 设置朋友圈分享的数据
+			  wx.updateTimelineShareData({
+				...shareData,
+				success: () => {
+				  console.log('设置朋友圈分享的数据成功');
+				},
+				fail: (err) => {
+				  console.error('设置朋友圈分享的数据失败:', err);
+				}
+			  });
+	    },
+		handleShare() {
+			const ua = navigator.userAgent.toLowerCase();
+			this.isWeChat = /micromessenger/.test(ua);
+		  if (this.isWeChat) {
+			  this.loadWeChatSDK();	  
+		  }
+		   else {
+			// 普通浏览器环境下使用浏览器自带分享或分享链接
+			if (navigator.share) {
+				// console.error("123");
+			    navigator.share({
+					title: 'Datie123',
+					text: '打铁123-从这里开始！',
+					url: 'http://www.datie123.com'
+				}).then(() => console.log('分享成功'))
+					.catch(console.error);
+			} else {
+			  // 如果浏览器不支持分享API，提供一个简单的分享链接
+			  window.location.href = `https://www.datie123.com`;
+			}
+		  }
+		},
+		openRaceLink(url) {
+			switch (process.env.UNI_PLATFORM) {
+			  case 'app-plus':
+				console.log('当前环境是 App');
+				plus.runtime.openURL(url);
+				break;
+			  case 'h5':
+				console.log('当前环境是 H5');
+				window.location.href = url;
+				// window.open(url, '_blank');
+				break;
+			  case 'mp-weixin':
+				console.log('当前环境是微信小程序');
+				window.location.href = url;
+				break;
+			  // 添加其他情况...
+			  default:
+				console.log('未知环境');
+				uni.navigateTo({
+				  url: '/pages/news/chinaraces'
+				});
+				break;
+			}
+		}, 
+		 checkWeChatEnvironment() {
+		       const userAgent = navigator.userAgent.toLowerCase();
+		       this.isWeChatEnvironment = /micromessenger/.test(userAgent);
+		     },
+	},
+  mounted() {
+	  // 在组件挂载后调用 fetchRaceData 方法
+	  this.fetchRaceDatanit();	  
+	  this.checkWeChatEnvironment();
+	  this.loadWeChatSDK();
+	  // this.loadWeChatSDK();
+	}
+}
+</script>
+
+<style lang="scss">
+	$nav-height: 30px;
+	
+	.loading {
+	  position: absolute;
+	  left: 50%;
+	  top: 10px;
+	  transform: translateX(-50%);
+	}
+	
+	.scroll-view {
+	  height: 100%;
+	  overflow: auto;
+	}
+	.box-bg {
+		background-color: #F5F5F5;
+		flex-direction: column;
+		display: flex;
+	}
+	.box-bg2 {
+		height: 80px;
+		background-color: #F5F5F5;
+	}
+	
+	.drawer-text {
+		margin-left: 6px;
+	}
+	
+	.tag-padding {
+		padding-left: 4px;
+		padding-right: 4px;
+		margin-left: 10px;
+	}
+	
+	.grid-item-title {
+		font-size: 12px;
+		color: #333333;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		padding-right: 18px;
+	}
+	
+	.grid-item-title-brand {
+		width: 60px;
+		height: 42px;
+		font-size: 12px;
+		text-align: center;
+		color: #333333;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		padding-right: 18px;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		/* 限制为两行 */
+	}
+	
+	.grid-item-sub-title {
+		font-size: 10px;
+		color: #333333;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		padding-right: 18px;
+	}
+	
+	.tag-sub-padding {
+		padding-left: 4px;
+		padding-right: 4px;
+		margin-right: 5px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	
+	.drawer-item {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		// flex: 1;
+		flex-direction: row;
+		// background-color: aqua;
+		align-items: center;
+		justify-content: flex-start;
+		margin-left: 16px;
+		margin-bottom: 16px;
+		// width: 160rpx;
+		// margin-left: 4px;
+	}
+	
+	.section-item {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		// flex: 1;
+		flex-direction: row;
+		// background-color: aqua;
+		align-items: center;
+		justify-content: flex-start;
+		margin-top: 6px;
+		// width: 160rpx;
+		// margin-left: 4px;
+	}
+	
+	.section-title-space {
+		display: flex;
+		// flex-grow: 1;
+		flex: 1;
+	}
+	
+	.home-icon-bg {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		// flex: 1;
+		flex-direction: row;
+		// background-color: aqua;
+		align-items: center;
+		height: 100%;
+		// width: 160rpx;
+		// margin-left: 4px;
+	}
+	
+	.text-h1 {
+		font-size: 14px;
+		font-weight: bold;
+		color: black;
+	}
+	
+	.text-h2 {
+		font-size: 15px;
+		font-weight: bold;
+		color: black;
+	}
+	
+	.navi-left-image {
+		height: 22px;
+		width: 22px;
+	}
+	
+	.row_style {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: row;
+		align-items: center;
+		justify-content: flex-start;
+	}
+	
+	.cell-card {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+	}
+	
+	.tag-container {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: row;
+		margin-top: 8px;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.rank2-tag-container {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.new-badge-image {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		width: 20px;
+		height: 20px;
+	}
+	
+	.section-image {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		width: 20px;
+		height: 20px;
+	}
+	
+	.section-image-drop-down {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		width: 28px;
+		height: 30px;
+	}
+	
+	.image-padding-left {
+		width: 14px;
+		height: 14px;
+		padding-left: 1px;
+	}
+	
+	.hr-line {
+		height: 1px;
+		/* 线的高 */
+		background-color: #e5e5e5;
+		/* 线的颜色 */
+		border: none;
+		/* 去除边框 */
+		margin: 4px 0;
+		/* 上下外边距 */
+	}
+	
+	.drawer-image {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		flex: 1;
+		width: 60%;
+		// background-color: #ff0000;
+	}
+	
+	.input-view {
+		/* #ifndef APP-PLUS-NVUE */
+		display: flex;
+		/* #endif */
+		flex: 1;
+		// width: 100%;
+		flex-direction: row-reverse;
+		// background-color: #ff0000;
+		height: 90%;
+		flex-wrap: nowrap;
+	}
+	
+	.beian-container {
+		padding: 10px;
+		text-align: center;
+		font-size: 14px;
+		color: #999;
+	}
+	
+	.beian-text {
+		margin-right: 8px;
+	}
+	
+	.beian-link {
+		color: #999;
+		text-decoration: none;
+		/* 取消下划线 */
+	}
+	
+	.swiper-box {
+		height: 100px;
+	}
+	
+	.swiper-item {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		height: 50px;
+	}
+	//以下是下拉框的样式
+
+	.filter-row {
+	  // position: fixed;
+	  position: fixed;
+	  top: 40px;
+	  left: 0;
+	  width: 100%;
+	  // background-color: white; /* 防止背景透明导致下面的内容可见 */
+	  z-index: 1000; /* 确保它在其他内容之上 */
+	  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影效果，增强视觉层次 */
+	  display: flex;
+	  justify-content: flex-end; /* 确保下拉框在一行内，并且间距均匀 */
+	  align-items: center;
+	  flex-wrap: nowrap; /* 强制不换行 */
+	  background-color: white;
+	  height: 40px;
+	  
+	}
+	
+	.filter-item {
+	  // flex: 0 0 15%; /* 每个下拉框固定占用20%的宽度 */
+	  width: 10%;
+	  min-width: 60px;
+	  margin-left: 20px;
+	  
+	  display: flex;
+	  box-sizing: border-box;
+	  background-color: white;
+	  align-items: center;
+	}
+	.filter-item3 {
+	  // flex: 0 0 15%; /* 每个下拉框固定占用20%的宽度 */
+	  width: 10%;
+	  min-width: 80px;
+	  margin-left: 20px;
+	  
+	  display: flex;
+	  box-sizing: border-box;
+	  background-color: white;
+	  align-items: center;
+	}
+	.filter-item4 {
+	  // flex: 0 0 15%; /* 每个下拉框固定占用20%的宽度 */
+	  width: 10%;
+	  min-width: 80px;
+	  margin-right: 10px;
+	  
+	  display: flex;
+	  box-sizing: border-box;
+	  background-color: white;
+	  align-items: center;
+	}
+	.filter-item2 {
+	  // flex: 0 0 18%; /* 每个下拉框固定占用20%的宽度 */
+	  width: 15%;
+	  min-width: 80px;
+	  box-sizing: border-box;
+	  background-color: white;
+	  align-items: center;
+	}
+	
+	.filter-item label {
+	  display: block;
+	  // margin-bottom: 5px; /* 给标签与选择器之间添加一点间距 */
+	  background-color: white;
+	  align-items: center;
+	}
+	
+	.picker-text {
+	  display: flex;
+	  justify-content: space-between;
+	  align-items: center;
+	  width: 100%; /* 占据整个 picker 的宽度 */
+	  padding-right: 20px; /* 确保文本和箭头之间有足够的间距 */
+	  box-sizing: border-box;
+	  font-family: 'Noto Sans CJK SC', '思源黑体', sans-serif;
+	  font-size: 14px;
+	}
+	.dropdown {
+		position: absolute;
+		top: 50px;
+		width: 100%;
+		background-color: white;
+		border: 1px solid #ccc;
+		box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+	}
+	
+	.dropdown-item {
+		padding: 10px;
+		cursor: pointer;
+	}
+	
+	.dropdown-item:hover {
+		background-color: #f5f5f5;
+	}
+
+	.picker-text::after {
+	  content: ''; /* 必须设置为空 */
+	  position: absolute;
+	  right: 8px; /* 调整箭头位置 */
+	  top: 50%;
+	  transform: translateY(-50%); /* 垂直居中 */
+	  pointer-events: none; /* 确保点击事件不会触发箭头 */
+	  width: 0;
+	  height: 0;
+	  border-left: 4px solid transparent;
+	  border-right: 4px solid transparent;
+	  border-top: 8px solid black;
+	  text-align: center;
+	}
+	//以下为赛事详情布局
+	.races-container {
+	  display: flex;
+	  flex-wrap: wrap; /* 允许换行 */
+	  gap: 10px; /* 控制项目之间的间距 */
+	  justify-content: center; /* 使子项居中 */
+		  // padding: 10px;
+	  margin-top: 35px; /* 这个值应该等于 .filter-row 的高度 */
+	  overflow-y: auto; /* 如果需要滚动 */
+	  padding: 5px;
+	  
+	  // background-color: white;
+	  
+	}
+	
+	.race-item {
+	  width: 376px;
+	  height: 110px;
+	  border: 1px solid #ccc; /* 设置边框 */
+	  border-radius: 10px; /* 设置圆角 */
+	  margin-bottom: 5px;
+	  position: relative;
+	  // padding: 16px;
+	  // margin-bottom: 16px;
+	  cursor: pointer;
+	  color: white;
+	  background-color: #f0f0f0; /* 设置默认背景颜色 */
+	  background-size: cover;
+	  background-position: center;
+	  transition: background-image 0.5s ease-in-out; /* 添加平滑过渡效果 */
+	}
+	.overlay {
+	  border: 1px solid #ccc; /* 设置边框 */
+	  border-radius: 10px; /* 设置圆角 */
+	  position: absolute;
+	  top: 0;
+	  left: 0;
+	  width: 100%;
+	  height: 100%;
+	  background-color: rgba(0, 0, 0, 0.3); /* 黑色背景，透明度 30% */
+	  z-index: 1; /* 确保遮罩层在背景图片之上 */
+	}
+	
+	.content {
+	border: 1px solid #ccc; /* 设置边框 */
+	border-radius: 10px; /* 设置圆角 */
+	width:376px;
+	height: 110px;
+	position: relative;
+	z-index: 2; /* 确保内容在遮罩层之上 */
+	}
+	.title {
+	  font-size: 16px;
+	  font-weight: bold;
+	  margin-bottom: 0px;
+	  margin-top: 8px;
+	  text-align: center;
+	  color: white;        /* 设置文本颜色为白色 */
+	  font-family: 'Noto Sans CJK SC', '思源黑体', sans-serif; /* 使用正确的字体族属性 */
+	  height: 24px;
+	}
+	
+	.race-details {
+	  display: flex; /* 使子元素水平排列 */
+	  //align-items: center; /* 使左右部分垂直居中 *//
+	  height: 78px;
+	}
+	
+	.detail-left {
+	  margin-left: 20px; /* 留出间隔 */
+	  width: 10%;
+	}
+	
+	.race-icon {
+	  width: 50px; /* 固定宽度 */
+	  height: 50px; /* 固定高度 */
+	  background-size: contain; /* 保持图片比例缩放 */
+	  background-position: center; /* 图片居中显示 */
+	  background-repeat: no-repeat; /* 防止图片重复 */
+	  border-radius: 50%; /* 使图片变成圆形 */
+	  user-select: none; /* 禁止选择 */
+	    -moz-user-select: none;
+	    -webkit-user-select: none;
+	    -ms-user-select: none;
+	    pointer-events: none; /* 禁止所有指针事件，包括右键菜单 */
+	  // object-fit: cover; /* 保持图片比例并覆盖整个区域 */
+	}
+	
+	.detail-right {
+		margin-bottom: 0%;
+	  margin-left: 20%;
+	  font-size: 14px;
+	  display: flex; /* 使右侧部分的内容按列排列 */
+	  flex-direction: column; /* 强制右侧内容垂直排列 */
+	  width: 55%;
+	}
+	
+	.top-row {
+	  // display: flex; /* 使用 flex 保证水平排列 */
+	  // justify-content: space-between; /* 水平分散排列 */
+	  // align-items: center;
+	  text-align: center;  /* 可选：居中文本 */
+	  width: 80%; /* 保证占满整个宽度 */
+	  // margin-top: 10px;
+	}
+	
+	.bottom-row {
+	  margin-bottom: 0px;
+	  display: flex;
+	  // justify-content: space-between; /* 水平排列 */
+	  align-items: center;
+	  width: 80%;
+	  margin-top: 30px;
+	}
+	.top-row-text{
+		width: 100%;
+		font-size: 14px;
+		font-weight: bold; /* 设置为粗体 */
+		align-items: center; /* 垂直居中 */
+		color: white;        /* 设置文本颜色为白色 */
+		font-family: 'Noto Sans CJK SC', '思源黑体', sans-serif; /* 使用正确的字体族属性 */
+	}
+	.top-row-text2{
+		font-size: 12px;
+		font-weight: bold; /* 设置为粗体 */
+		// margin-left: 50%;
+	}
+	.bottom-row-text{
+		width: 48%;
+		font-size: 12px;
+		font-weight: bold; /* 设置为粗体 */
+		background-color: #E10225; /* 设置背景颜色为红色 */
+		color: white;        /* 设置文本颜色为白色 */
+		padding: 5px;        /* 可选：添加一些内边距以改善视觉效果 */
+		text-align: center;  /* 可选：居中文本 */
+		color: white;        /* 设置文本颜色为白色 */
+		font-family: 'Noto Sans CJK SC', '思源黑体', sans-serif; /* 使用正确的字体族属性 */
+	}
+	.bottom-row-text2{
+		width: 35%;
+		font-size: 12px;
+		color: #E10225; /* 设置文字颜色为红色 */
+		font-weight: bold; /* 设置为粗体 */
+		background-color: white; /* 设置背景颜色为红色 */
+		padding: 5px; /* 可选，添加内边距来让文字与边框之间有一些间距 */
+		// margin-bottom: 5px;
+		text-align: center;  /* 可选：居中文本 */
+		font-family: 'Noto Sans CJK SC', '思源黑体', sans-serif; /* 使用正确的字体族属性 */
+		// margin-left: 10px;
+		// margin-left: 50%;
+	}
+	/* 为分享按钮添加样式 */
+	.share-button {
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  padding: 0; /* 移除默认内边距 */
+	  margin: 0; /* 移除默认外边距 */
+	  background-color: white; /* 设置背景透明 */
+	  border: none; /* 移除边框 */
+	  outline: none; /* 移除点击时的轮廓线 */
+	  cursor: pointer; /* 改变鼠标指针样式 */
+	}
+	
+	.navi-left-image.home-icon {
+	  width: 22px; /* 根据需要调整尺寸 */
+	  height: 22px; /* 根据需要调整尺寸 */
+	  object-fit: contain; /* 确保图片按照原比例缩放 */
+	}
+	.content-scroll {
+	  flex-grow: 1;
+	}
+	.dropdown {
+	  /* 样式调整下拉菜单 */
+	  border: 1px solid #ccc;
+	  padding: 5px 0;
+	  background-color: white;
+	  width: 100px;
+	  text-align: center;
+	}
+	.dropdown-item {
+	  padding: 10px;
+	  cursor: pointer;
+	}
+</style>

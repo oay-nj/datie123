@@ -470,15 +470,31 @@
 			},
 			
 			onClickBanner(item) {
-				let url = item.link_main;
-				// #ifdef APP-PLUS
-				plus.runtime.openURL(url);
-				// #endif
-				
-				// #ifdef H5
-				window.open(url, '_blank');
-				// #endif
 				this.addSingleStaticsDetail(item);
+				// 获取目标链接
+				let url = item.link_main;				
+				switch (process.env.UNI_PLATFORM) {
+				  case 'app-plus':
+					console.log('当前环境是 App');
+					plus.runtime.openURL(url);
+					break;
+				  case 'h5':
+					console.log('当前环境是 H5');
+					window.location.href = url;
+					// window.open(url, '_blank');
+					break;
+				  case 'mp-weixin':
+					console.log('当前环境是微信小程序');
+					window.location.href = url;
+					break;
+				  // 添加其他情况...
+				  default:
+					console.log('未知环境');
+					uni.navigateTo({
+					  url: '/pages/news/chinaraces'
+					});
+					break;
+				}    
 			},
 
 			onClickDetailItem(item) {
