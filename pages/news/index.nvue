@@ -207,7 +207,7 @@
 			</uni-grid>
 		</uni-card>
 		<view class="beian-container">
-			<text class="beian-text" @click="openBeianLink">备案号：苏ICP备2022016640号-3</text>
+			<text class="beian-text" @click="openBeianLink">苏ICP备2022016640号-3</text>
 		</view>
 	</view>
 	<view class="back-to-top" @click="scrollToTop">
@@ -346,6 +346,7 @@
 				brandRank4: [],
 				brandRank4selected: '',
 				brandList: [],
+				isWeChatEnvironment: false, // 初始状态，默认不是微信环境
 			}
 		},
 		onReady() {
@@ -354,10 +355,101 @@
 			this.queryTeamDicList();
 			this.queryBrandDicList();
 			this.queryHotInfoList();
+			this.checkWeChatEnvironment();
+			this.loadWeChatSDK();
 			// this.queryData();
 			// this.queryTrainData();
 		},
 		methods: {
+			loadWeChatSDK() {
+				if(this.isWeChatEnvironment){
+					const script = document.createElement('script');
+								script.src = 'https://res.wx.qq.com/open/js/jweixin-1.6.0.js';
+								script.onload = () => {
+									if (typeof wx !== 'undefined') {
+										// callback();
+										// console.error(typeof wx);
+									} else {
+										console.error('微信JS-SDK加载失败');
+									}
+								};
+								document.head.appendChild(script);
+								// 获取当前网页的URL，不包含#及其后面部分
+								const url1 = encodeURIComponent(window.location.href.split('#')[0]);
+								// const url = 'https://www.datie123.com';
+								// console.error('当前 URL:', url1);
+								// 调用后端API获取签名等信息
+								uni.request({
+									url: 'https://www.datie123.com/entry/getShareConfig?url=' + url1, // 替换为你的后端API地址
+									method: 'GET',
+									success: (res) => {
+									if (res.statusCode === 200 && res.data) {
+									this.configData = res.data;
+									
+									this.initWeChatSDK();
+									} else {
+									console.error('获取微信JS-SDK配置失败:', res);
+								  }
+								},
+								fail: (error) => {
+								  console.error('请求微信JS-SDK配置失败:', error);
+								}
+					});
+				}else(
+				console.error('当前非微信环境')
+				)		
+			},
+			initWeChatSDK() {
+				// console.error('获取到的配置数据:', this.configData);
+				// console.error('获取到的配置数据:', JSON.stringify(this.configData, null, 2));
+				  wx.config({
+					debug: false, // 开启调试模式
+					appId: this.configData.appId, // 必填，公众号的唯一标识
+					timestamp: this.configData.timestamp, // 必填，生成签名的时间戳
+					nonceStr: this.configData.nonceStr, // 必填，生成签名的随机串
+					signature: this.configData.signature, // 必填，签名
+					jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData'] // 必填，需要使用的JS接口列表
+				  });	
+				wx.ready(() => {
+				  // console.log('微信JS-SDK加载成功');
+				  this.initWeChatShare();
+				});  
+				wx.error((res) => {
+				  console.error('微信 JS SDK 配置失败:', res);		  
+				});
+			},
+			initWeChatShare() {
+			  const shareData = {
+				title: '打铁123-打铁从这里开始！', // 分享标题
+				desc: '提供铁人三项相关的赛事、装备、团体、训练、营养等内容', // 分享描述
+				link: 'https://www.datie123.com', // 分享链接
+				imgUrl: 'https://www.datie123.com/images/share.jpg', // 分享图标		
+			  };		
+				  wx.updateAppMessageShareData({
+					...shareData,
+					success: () => {
+					  console.log('设置给朋友分享的数据成功');
+					},
+					fail: (err) => {
+					  console.error('设置给朋友分享的数据失败:', err);
+					}
+				  });
+				
+				  // 设置朋友圈分享的数据
+				  wx.updateTimelineShareData({
+					...shareData,
+					success: () => {
+					  console.log('设置朋友圈分享的数据成功');
+					},
+					fail: (err) => {
+					  console.error('设置朋友圈分享的数据失败:', err);
+					}
+				  });
+			},
+			checkWeChatEnvironment() {
+			      const userAgent = navigator.userAgent.toLowerCase();
+			      this.isWeChatEnvironment = /micromessenger/.test(userAgent);
+			},
 			showDrawer() {
 				this.$refs.showLeft.open();
 			},
@@ -470,6 +562,7 @@
 			},
 			
 			onClickBanner(item) {
+				console.error('123')
 				this.addSingleStaticsDetail(item);
 				// 获取目标链接
 				let url = item.link_main;				
@@ -1298,7 +1391,7 @@
 	.swiper-item-img {
 		width: 100%;
 		height: 100%;
-		pointer-events: none; /* 禁止图片交互 */
+		// pointer-events: none; /* 禁止图片交互 */
 	}
 	
 	/* 返回顶部图标样式 */

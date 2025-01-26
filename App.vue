@@ -6,7 +6,7 @@
 			// #endif
 		},
 		onShow: function() {
-			document.title = "打铁123-打铁从这里开始！";
+			// document.title = "打铁123-打铁从这里开始！";
 			console.log('App Show');
 		},
 		onHide: function() {
