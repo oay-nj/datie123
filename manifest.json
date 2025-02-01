@@ -1,12 +1,13 @@
 {
     "name" : "Datie123",
-    "appid" : "__UNI__14C46E2",
+    "appid" : "__UNI__32F2B2B",
     "description" : "基于uni-app开发的新闻/资讯类App模板",
     "versionName" : "3.1.23",
     "versionCode" : 1,
     "transformPx" : false,
     "uniStatistics" : {
-        "enable" : false
+        "enable" : false,
+        "version" : "2"
     },
     "compatConfig" : {
         "MODE" : 2 // 2代表兼容Vue2模式，3代表非兼容Vue2模式
@@ -73,6 +74,9 @@
                     }
                 }
             }
+        },
+        "uniStatistics" : {
+            "enable" : false
         }
     },
     "quickapp" : {},
@@ -81,16 +85,28 @@
         "setting" : {
             "urlCheck" : false
         },
-        "usingComponents" : true
+        "usingComponents" : true,
+        "uniStatistics" : {
+            "enable" : false
+        }
     },
     "mp-alipay" : {
-        "usingComponents" : true
+        "usingComponents" : true,
+        "uniStatistics" : {
+            "enable" : false
+        }
     },
     "mp-baidu" : {
-        "usingComponents" : true
+        "usingComponents" : true,
+        "uniStatistics" : {
+            "enable" : false
+        }
     },
     "mp-toutiao" : {
-        "usingComponents" : true
+        "usingComponents" : true,
+        "uniStatistics" : {
+            "enable" : false
+        }
     },
     "h5" : {
         "router" : {
@@ -102,7 +118,55 @@
             "treeShaking" : {
                 "enable" : true
             }
+        },
+        "uniStatistics" : {
+            "enable" : false
         }
     },
-    "vueVersion" : "3"
+    "vueVersion" : "3",
+    "app-harmony" : {
+        "uniStatistics" : {
+            "enable" : false
+        }
+    },
+    "mp-harmony" : {
+        "uniStatistics" : {
+            "enable" : false
+        }
+    },
+    "mp-jd" : {
+        "uniStatistics" : {
+            "enable" : false
+        }
+    },
+    "mp-kuaishou" : {
+        "uniStatistics" : {
+            "enable" : false
+        }
+    },
+    "mp-lark" : {
+        "uniStatistics" : {
+            "enable" : false
+        }
+    },
+    "mp-qq" : {
+        "uniStatistics" : {
+            "enable" : false
+        }
+    },
+    "mp-xhs" : {
+        "uniStatistics" : {
+            "enable" : false
+        }
+    },
+    "quickapp-webview-huawei" : {
+        "uniStatistics" : {
+            "enable" : false
+        }
+    },
+    "quickapp-webview-union" : {
+        "uniStatistics" : {
+            "enable" : false
+        }
+    }
 }

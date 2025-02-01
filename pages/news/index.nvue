@@ -1117,7 +1117,7 @@
 			},
 
 			addSingleStaticsDetail(item) {
-				const currentTime = new Date().toString();
+				const currentTime = new Date().toLocaleString();
 				let detailInfo = {
 					entry_id: item.entry_id,
 					element_id: item.id,

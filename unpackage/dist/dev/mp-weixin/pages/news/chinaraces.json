@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "2025国内铁三赛事",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "uni-nav-bar": "../../uni_modules/uni-nav-bar/components/uni-nav-bar/uni-nav-bar"
+  }
+}

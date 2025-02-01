@@ -1,0 +1,13 @@
+{
+  "navigationBarTitleText": "打铁123-从这里开始！",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "horizontal-scroller": "../../components/horizontal-scroller",
+    "uni-nav-bar": "../../uni_modules/uni-nav-bar/components/uni-nav-bar/uni-nav-bar",
+    "uni-drawer": "../../uni_modules/uni-drawer/components/uni-drawer/uni-drawer",
+    "uni-tag": "../../uni_modules/uni-tag/components/uni-tag/uni-tag",
+    "uni-grid-item": "../../uni_modules/uni-grid/components/uni-grid-item/uni-grid-item",
+    "uni-grid": "../../uni_modules/uni-grid/components/uni-grid/uni-grid",
+    "uni-card": "../../uni_modules/uni-card/components/uni-card/uni-card"
+  }
+}

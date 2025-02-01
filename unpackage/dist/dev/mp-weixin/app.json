@@ -1,0 +1,14 @@
+{
+  "pages": [
+    "pages/news/index",
+    "pages/news/detail",
+    "pages/news/chinaraces"
+  ],
+  "window": {
+    "navigationStyle": "custom",
+    "navigationBarTextStyle": "white",
+    "navigationBarBackgroundColor": "#2F85FC",
+    "backgroundColor": "#FFFFFF"
+  },
+  "usingComponents": {}
+}

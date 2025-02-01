@@ -1,0 +1,682 @@
+@import "../../nvue.wxss";
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.loading {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%);
+}
+.scroll-view {
+  height: 100%;
+  overflow: auto;
+}
+.box-bg {
+  background-color: #F5F5F5;
+  flex-direction: column;
+  display: flex;
+}
+.box-bg2 {
+  height: 80px;
+  background-color: #F5F5F5;
+}
+.drawer-text {
+  margin-left: 6px;
+}
+.tag-padding {
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-left: 10px;
+}
+.grid-item-title {
+  font-size: 12px;
+  color: #333333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 18px;
+}
+.grid-item-title-brand {
+  width: 60px;
+  height: 42px;
+  font-size: 12px;
+  text-align: center;
+  color: #333333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 18px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  /* 限制为两行 */
+}
+.grid-item-sub-title {
+  font-size: 10px;
+  color: #333333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 18px;
+}
+.tag-sub-padding {
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-right: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.drawer-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  margin-left: 16px;
+  margin-bottom: 16px;
+}
+.section-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 6px;
+}
+.section-title-space {
+  display: flex;
+  flex: 1;
+}
+.home-icon-bg {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100%;
+}
+.text-h1 {
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
+}
+.text-h2 {
+  font-size: 15px;
+  font-weight: bold;
+  color: black;
+}
+.navi-left-image {
+  height: 22px;
+  width: 22px;
+}
+.row_style {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+.cell-card {
+  display: flex;
+}
+.tag-container {
+  display: flex;
+  flex-direction: row;
+  margin-top: 8px;
+  align-items: center;
+  justify-content: center;
+}
+.rank2-tag-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.new-badge-image {
+  display: flex;
+  width: 20px;
+  height: 20px;
+}
+.section-image {
+  display: flex;
+  width: 20px;
+  height: 20px;
+}
+.section-image-drop-down {
+  display: flex;
+  width: 28px;
+  height: 30px;
+}
+.image-padding-left {
+  width: 14px;
+  height: 14px;
+  padding-left: 1px;
+}
+.hr-line {
+  height: 1px;
+  /* 线的高 */
+  background-color: #e5e5e5;
+  /* 线的颜色 */
+  border: none;
+  /* 去除边框 */
+  margin: 4px 0;
+  /* 上下外边距 */
+}
+.drawer-image {
+  display: flex;
+  flex: 1;
+  width: 60%;
+}
+.input-view {
+  display: flex;
+  flex: 1;
+  flex-direction: row-reverse;
+  height: 90%;
+  flex-wrap: nowrap;
+}
+.beian-container {
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+  color: #999;
+}
+.beian-text {
+  margin-right: 8px;
+}
+.beian-link {
+  color: #999;
+  text-decoration: none;
+  /* 取消下划线 */
+}
+.swiper-box {
+  height: 100px;
+}
+.swiper-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+}
+.filter-row {
+  position: fixed;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  /* 确保它在其他内容之上 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* 添加阴影效果，增强视觉层次 */
+  display: flex;
+  justify-content: center;
+  /* 确保下拉框在一行内，并且间距均匀 */
+  align-items: center;
+  flex-wrap: nowrap;
+  /* 强制不换行 */
+  background-color: white;
+  height: 40px;
+}
+.filter-item {
+  min-width: 5%;
+  max-width: 50%;
+  display: flex;
+  box-sizing: border-box;
+  background-color: white;
+  align-items: center;
+}
+.filter-item2 {
+  min-width: 5%;
+  max-width: 36%;
+  box-sizing: border-box;
+  background-color: white;
+  align-items: center;
+}
+.filter-item3 {
+  min-width: 5%;
+  max-width: 36%;
+  display: flex;
+  box-sizing: border-box;
+  background-color: white;
+  align-items: center;
+}
+.filter-item4 {
+  min-width: 5%;
+  max-width: 36%;
+  display: flex;
+  box-sizing: border-box;
+  background-color: white;
+  align-items: center;
+}
+.filter-item label {
+  display: block;
+  background-color: white;
+  align-items: center;
+}
+.picker-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  /* 占据整个 picker 的宽度 */
+  padding-right: 20px;
+  /* 确保文本和箭头之间有足够的间距 */
+  box-sizing: border-box;
+  font-family: "Noto Sans CJK SC", "思源黑体", sans-serif;
+  font-size: 13px;
+}
+.dropdown {
+  font-size: 12px;
+  position: absolute;
+  top: 25px;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+.dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+}
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+.picker-text::after {
+  content: "";
+  /* 必须设置为空 */
+  position: absolute;
+  right: 8px;
+  /* 调整箭头位置 */
+  top: 50%;
+  transform: translateY(-50%);
+  /* 垂直居中 */
+  pointer-events: none;
+  /* 确保点击事件不会触发箭头 */
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 8px solid black;
+  text-align: center;
+}
+.races-container {
+  display: flex;
+  flex-wrap: wrap;
+  /* 允许换行 */
+  gap: 10px;
+  /* 控制项目之间的间距 */
+  justify-content: center;
+  /* 使子项居中 */
+  margin-top: 35px;
+  /* 这个值应该等于 .filter-row 的高度 */
+  overflow-y: auto;
+  /* 如果需要滚动 */
+  padding: 5px;
+}
+.race-item {
+  width: 376px;
+  height: 110;
+  border: 1px solid #ccc;
+  /* 设置边框 */
+  border-radius: 10px;
+  /* 设置圆角 */
+  margin-bottom: 5px;
+  position: relative;
+  cursor: pointer;
+  color: white;
+  background-color: #f0f0f0;
+  /* 设置默认背景颜色 */
+  background-size: cover;
+  background-position: center;
+  transition: background-image 0.5s ease-in-out;
+  /* 添加平滑过渡效果 */
+}
+.overlay {
+  border: 1px solid #ccc;
+  /* 设置边框 */
+  border-radius: 10px;
+  /* 设置圆角 */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  /* 黑色背景，透明度 30% */
+  z-index: 1;
+  /* 确保遮罩层在背景图片之上 */
+}
+.content {
+  border: 1px solid #ccc;
+  /* 设置边框 */
+  border-radius: 10px;
+  /* 设置圆角 */
+  width: 376px;
+  height: 110px;
+  position: relative;
+  z-index: 2;
+  /* 确保内容在遮罩层之上 */
+}
+.title {
+  display: flex;
+  /* 使用 Flexbox */
+  width: 345px;
+  border-radius: 10px;
+  /* 设置圆角 */
+  font-weight: bold;
+  margin-bottom: 0px;
+  margin-top: 8px;
+  text-align: center;
+  color: white;
+  /* 设置文本颜色为白色 */
+  font-family: "Noto Sans CJK SC", "思源黑体", sans-serif;
+  /* 使用正确的字体族属性 */
+  font-size: 15px;
+  height: 25px;
+  margin-left: 20px;
+}
+.title-bar {
+  display: flex;
+  /* 使用 Flexbox */
+  align-items: center;
+  /* 垂直居中 */
+  width: 358px;
+  border-radius: 10px;
+  /* 设置圆角 */
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 1px;
+  margin-top: 1px;
+  margin-left: 30px;
+  color: white;
+  /* 设置文本颜色为白色 */
+  font-family: "Noto Sans CJK SC", "思源黑体", sans-serif;
+  /* 使用正确的字体族属性 */
+  height: 30px;
+}
+.img-icon {
+  height: 32px;
+  width: 32px;
+}
+.title2 {
+  margin-left: 10px;
+  display: flex;
+  /* 使用 Flexbox */
+  align-items: center;
+  /* 垂直居中对齐 */
+  font-size: 11px;
+  text-align: center;
+  color: white;
+  /* 设置文本颜色为白色 */
+  font-family: "Noto Sans CJK SC", "思源黑体", sans-serif;
+  /* 使用正确的字体族属性 */
+  height: 16px;
+  width: 250px;
+}
+.title-container {
+  align-items: center;
+  /* 垂直居中 */
+  display: flex;
+  /* 使用 Flexbox */
+  width: 350px;
+  height: 38px;
+  margin-left: 20px;
+}
+.title-container-left {
+  width: 260px;
+  height: 36px;
+}
+.title-container-left-detail {
+  align-items: center;
+  /* 垂直居中 */
+  display: flex;
+  /* 使用 Flexbox */
+  width: 260px;
+  height: 18px;
+}
+.title-container-right {
+  align-items: center;
+  /* 垂直居中 */
+  display: flex;
+  /* 使用 Flexbox */
+  width: 40px;
+  height: 36px;
+  margin-left: 45px;
+}
+.location-icon {
+  height: 10px;
+  /* 固定高度 */
+  border-radius: 50%;
+  /* 如果需要圆形图标 */
+  -webkit-user-select: none;
+          user-select: none;
+  /* 禁止选择 */
+  pointer-events: none;
+  /* 禁止所有指针事件，包括右键菜单 */
+}
+.race-details {
+  display: flex;
+  /* 使子元素水平排列 */
+  height: 24px;
+  width: 376px;
+  margin-top: 5px;
+}
+.race-details-left {
+  display: flex;
+  /* 使子元素水平排列 */
+  align-items: center;
+  /* 使左右部分垂直居中 */
+  height: 24px;
+  width: 200px;
+  margin-left: 10px;
+}
+.race-details-right {
+  align-items: center;
+  height: 24px;
+  width: 140px;
+  margin-left: 20px;
+}
+.detail-left {
+  margin-left: 0px;
+  /* 留出间隔 */
+  width: 34px;
+  align-items: cen;
+}
+.race-icon {
+  width: 28px;
+  /* 固定宽度 */
+  height: 28px;
+  /* 固定高度 */
+  background-size: contain;
+  /* 保持图片比例缩放 */
+  background-position: center;
+  /* 图片居中显示 */
+  background-repeat: no-repeat;
+  /* 防止图片重复 */
+  border-radius: 50%;
+  /* 使图片变成圆形 */
+  user-select: none;
+  /* 禁止选择 */
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  pointer-events: none;
+  /* 禁止所有指针事件，包括右键菜单 */
+}
+.detail-right {
+  margin-left: 39px;
+  font-size: 14px;
+  display: flex;
+  /* 使右侧部分的内容按列排列 */
+  flex-direction: column;
+  /* 强制右侧内容垂直排列 */
+  width: 55%;
+}
+.bottom-row {
+  margin-bottom: 0px;
+  display: flex;
+  align-items: center;
+  width: 160px;
+}
+.top-row-text {
+  width: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  /* 设置为粗体 */
+  align-items: center;
+  /* 垂直居中 */
+  color: white;
+  /* 设置文本颜色为白色 */
+  font-family: "Noto Sans CJK SC", "思源黑体", sans-serif;
+  /* 使用正确的字体族属性 */
+}
+.top-row-text2 {
+  font-size: 11px;
+  font-weight: bold;
+  /* 设置为粗体 */
+}
+.bottom-row-text {
+  width: 70px;
+  height: 18px;
+  line-height: 18px;
+  color: #E10225;
+  background-color: #FDEFEF;
+  text-align: center;
+  font-size: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-left: 10px;
+  border-radius: 2px;
+  font-family: "Noto Sans CJK SC", "思源黑体", sans-serif;
+}
+.bottom-row-text2 {
+  min-width: 30px;
+  max-width: 60px;
+  height: 18px;
+  line-height: 18px;
+  color: #E10225;
+  background-color: #FDEFEF;
+  text-align: center;
+  font-size: 11px;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-left: 10px;
+  border-radius: 4px;
+  padding: 0 3px;
+  /* 添加左右内边距 */
+  font-family: "Noto Sans CJK SC", "思源黑体", sans-serif;
+}
+.bottom-row-text3 {
+  min-width: 15px;
+  max-width: 40px;
+  height: 18px;
+  /* 设置高度为18像素 */
+  line-height: 18px;
+  /* 确保文本垂直居中 */
+  color: #E10225;
+  /* 设置字体颜色 */
+  background-color: #FDEFEF;
+  /* 设置背景颜色 */
+  text-align: center;
+  /* 水平居中文本 */
+  font-size: 11px;
+  /* 根据需要调整字体大小以适应容器 */
+  overflow: hidden;
+  /* 防止内容溢出 */
+  white-space: nowrap;
+  /* 防止文本换行 */
+  margin-left: 10px;
+  border-radius: 4px;
+  /* 设置圆角 */
+  padding: 0 3px;
+  /* 添加左右内边距 */
+  font-family: "Noto Sans CJK SC", "思源黑体", sans-serif;
+  /* 使用正确的字体族属性 */
+}
+.bottom-row-text4 {
+  width: 66px;
+  height: 24px;
+  /* 设置高度为24像素 */
+  color: white;
+  /* 设置字体颜色 */
+  background-color: #E10225;
+  /* 设置背景颜色 */
+  text-align: center;
+  /* 水平居中文本 */
+  font-size: 12px;
+  /* 根据需要调整字体大小以适应容器 */
+  overflow: hidden;
+  /* 防止内容溢出 */
+  white-space: nowrap;
+  /* 防止文本换行 */
+  margin-left: 58px;
+  border-radius: 4px;
+  /* 设置圆角 */
+  font-family: "Noto Sans CJK SC", "思源黑体", sans-serif;
+  /* 使用正确的字体族属性 */
+  display: flex;
+  /* 使用 Flexbox */
+  align-items: center;
+  /* 垂直居中对齐 */
+  justify-content: center;
+  /* 水平居中对齐 */
+  box-sizing: border-box;
+  /* 确保内边距不会增加元素的宽度 */
+}
+.share-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  /* 移除默认内边距 */
+  margin: 0;
+  /* 移除默认外边距 */
+  background-color: white;
+  /* 设置背景透明 */
+  border: none;
+  /* 移除边框 */
+  outline: none;
+  /* 移除点击时的轮廓线 */
+  cursor: pointer;
+  /* 改变鼠标指针样式 */
+}
+.navi-left-image.home-icon {
+  width: 30px;
+  /* 根据需要调整尺寸 */
+  height: 30px;
+  /* 根据需要调整尺寸 */
+  object-fit: cover;
+  /* 确保图片按照原比例缩放 */
+}
+.content-scroll {
+  flex-grow: 1;
+}
+.dropdown {
+  /* 样式调整下拉菜单 */
+  border: 1px solid #ccc;
+  padding: 5px 0;
+  background-color: white;
+  width: 100px;
+  text-align: center;
+}
+.dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+}
