@@ -1,7 +1,5 @@
 {
   "pages": [
-    "pages/news/index",
-    "pages/news/detail",
     "pages/news/chinaraces"
   ],
   "window": {

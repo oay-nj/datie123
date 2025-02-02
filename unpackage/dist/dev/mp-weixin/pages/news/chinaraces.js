@@ -47,7 +47,7 @@ const _sfc_main = {
     };
   },
   onPullDownRefresh() {
-    common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:189", "页面级下拉刷新被触发");
+    common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:190", "页面级下拉刷新被触发");
     this.handlePullDownRefresh();
   },
   methods: {
@@ -152,7 +152,7 @@ const _sfc_main = {
           icon: "success"
         });
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:300", "刷新时发生错误:", error);
+        common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:301", "刷新时发生错误:", error);
         common_vendor.index.stopPullDownRefresh();
         common_vendor.index.showToast({
           title: "刷新失败",
@@ -183,7 +183,7 @@ const _sfc_main = {
     // onRegionChange(e) {
     //   this.selectedRegion = this.regions[e.detail.value];
     //   this.selectedRegion = e.detail.value === 0 ? '' : this.regions[e.detail.value - 1];
-    //   // uni.__f__('error','at pages/news/chinaraces.nvue:351',this.selectedRegion)
+    //   // uni.__f__('error','at pages/news/chinaraces.nvue:352',this.selectedRegion)
     //   this.fetchRaceData();
     // },
     // onStatusChange(e) {
@@ -217,11 +217,11 @@ const _sfc_main = {
             const { areas, race_statuses, monthes, ranks4, races } = res.data;
             this.races = races;
           } else {
-            common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:386", "API request failed:", res);
+            common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:387", "API request failed:", res);
           }
         },
         fail: (err) => {
-          common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:390", "Failed to fetch race data:", err);
+          common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:391", "Failed to fetch race data:", err);
         }
       });
     },
@@ -243,11 +243,11 @@ const _sfc_main = {
             this.regions = ["全部", ...areas];
             this.statuses = ["全部", ...race_statuses];
           } else {
-            common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:415", "API request failed:", res);
+            common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:416", "API request failed:", res);
           }
         },
         fail: (err) => {
-          common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:419", "Failed to fetch race data:", err);
+          common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:420", "Failed to fetch race data:", err);
         }
       });
     },
@@ -259,7 +259,7 @@ const _sfc_main = {
           if (typeof common_vendor.wx$1 !== "undefined")
             ;
           else {
-            common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:432", "微信JS-SDK加载失败");
+            common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:433", "微信JS-SDK加载失败");
           }
         };
         document.head.appendChild(script);
@@ -273,15 +273,15 @@ const _sfc_main = {
               this.configData = res.data;
               this.initWeChatSDK();
             } else {
-              common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:450", "获取微信JS-SDK配置失败:", res);
+              common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:451", "获取微信JS-SDK配置失败:", res);
             }
           },
           fail: (error) => {
-            common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:454", "请求微信JS-SDK配置失败:", error);
+            common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:455", "请求微信JS-SDK配置失败:", error);
           }
         });
       } else
-        common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:458", "当前非微信环境");
+        common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:459", "当前非微信环境");
     },
     initWeChatSDK() {
       common_vendor.wx$1.config({
@@ -302,7 +302,7 @@ const _sfc_main = {
         this.initWeChatShare();
       });
       common_vendor.wx$1.error((res) => {
-        common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:477", "微信 JS SDK 配置失败:", res);
+        common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:478", "微信 JS SDK 配置失败:", res);
       });
     },
     initWeChatShare() {
@@ -319,19 +319,19 @@ const _sfc_main = {
       common_vendor.wx$1.updateAppMessageShareData({
         ...shareData,
         success: () => {
-          common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:490", "设置给朋友分享的数据成功");
+          common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:491", "设置给朋友分享的数据成功");
         },
         fail: (err) => {
-          common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:493", "设置给朋友分享的数据失败:", err);
+          common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:494", "设置给朋友分享的数据失败:", err);
         }
       });
       common_vendor.wx$1.updateTimelineShareData({
         ...shareData,
         success: () => {
-          common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:501", "设置朋友圈分享的数据成功");
+          common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:502", "设置朋友圈分享的数据成功");
         },
         fail: (err) => {
-          common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:504", "设置朋友圈分享的数据失败:", err);
+          common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:505", "设置朋友圈分享的数据失败:", err);
         }
       });
     },
@@ -348,7 +348,7 @@ const _sfc_main = {
         if (typeof plus !== "undefined" && plus.runtime) {
           plus.runtime.openURL(url);
         } else {
-          common_vendor.index.__f__("warn", "at pages/news/chinaraces.nvue:542", "plus 还未定义，回退到 window.location.href");
+          common_vendor.index.__f__("warn", "at pages/news/chinaraces.nvue:543", "plus 还未定义，回退到 window.location.href");
           window.location.href = url;
         }
       }, 0);
@@ -375,28 +375,28 @@ const _sfc_main = {
             statics_detail: detailInfo
           }
         });
-        common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:572", "请求结果", result);
+        common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:573", "请求结果", result);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:574", "请求失败", error);
+        common_vendor.index.__f__("error", "at pages/news/chinaraces.nvue:575", "请求失败", error);
       }
       const url = item.link_main;
       switch ("mp-weixin") {
         case "app-plus":
-          common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:580", "当前环境是 App");
+          common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:581", "当前环境是 App");
           plus.runtime.openURL(url);
           break;
         case "h5":
-          common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:584", "当前环境是 H5");
+          common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:585", "当前环境是 H5");
           window.location.href = url;
           break;
         case "mp-weixin":
-          common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:588", "当前环境是微信小程序");
+          common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:589", "当前环境是微信小程序");
           common_vendor.index.navigateTo({
             url
           });
           break;
         default:
-          common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:594", "未知环境");
+          common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:595", "未知环境");
           common_vendor.index.navigateTo({
             url: "/pages/news/chinaraces"
           });
@@ -417,7 +417,7 @@ const _sfc_main = {
           statics_detail: detailInfo
         }
       }).then((result) => {
-        common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:616", "EEEE", result);
+        common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:617", "EEEE", result);
       });
     },
     addSingleStaticsDetailInit() {
@@ -433,7 +433,7 @@ const _sfc_main = {
           statics_detail: detailInfo
         }
       }).then((result) => {
-        common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:632", "EEEE", result);
+        common_vendor.index.__f__("log", "at pages/news/chinaraces.nvue:633", "EEEE", result);
       });
     }
   },
@@ -454,8 +454,8 @@ if (!Math) {
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_assets._imports_0$1,
-    b: common_assets._imports_1$1,
+    a: common_assets._imports_0,
+    b: common_assets._imports_1,
     c: common_vendor.o((...args) => $options.handleShare && $options.handleShare(...args)),
     d: common_vendor.p({
       shadow: true,
@@ -545,8 +545,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         m: `url(${race.bk_image})`
       });
     }),
-    E: common_assets._imports_2$1,
-    F: common_assets._imports_3$1,
+    E: common_assets._imports_2,
+    F: common_assets._imports_3,
     G: common_vendor.o((...args) => $options.handlePullDownRefresh && $options.handlePullDownRefresh(...args)),
     H: common_vendor.o((...args) => $options.openBeianLink && $options.openBeianLink(...args))
   });

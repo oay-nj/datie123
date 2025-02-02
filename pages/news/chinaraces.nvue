@@ -18,12 +18,13 @@
                 </button>
             </template>
         </uni-nav-bar>
-		<scroll-view class="content-scroll" scroll-y enable-pull-down-refresh @refresherrefresh="handlePullDownRefresh" :style="{ minHeight: '100px' }">
+		<scroll-view class="content-scroll" scroll-y enable-pull-down-refresh 
+		@refresherrefresh="handlePullDownRefresh" :style="{ minHeight: '100px' }" enable-flex>
 			<div class="filter-row" >
 				<view class="filter-item" >
 					<view @click="toggleDropdown('Region')"
 						  class="picker-text" > 
-						{{ selectedRegion || '主办方' }}
+						{{ selectedRegion || '主办方'}}
 					</view>
 					<view v-if="showPickerRegion" class="dropdown" @mouseover="keepDropdown('Region')" @mouseleave="hideDropdown('Region')">
 						<view 

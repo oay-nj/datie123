@@ -1,15 +1,16 @@
 {
-  "pages": [{
-      "path": "pages/news/index",
-      "style": {
-		  "navigationBarTitleText": "打铁123-从这里开始！",
-		  "enablePullDownRefresh": true
-	  }	
-    },
-    {
-      "path": "pages/news/detail",
-      "style": {}
-    },
+  "pages": [
+	  // {
+   //    "path": "pages/news/index",
+   //    "style": {
+		 //  "navigationBarTitleText": "打铁123-从这里开始！",
+		 //  "enablePullDownRefresh": true
+	  // }	
+   //  },
+   //  {
+   //    "path": "pages/news/detail",
+   //    "style": {}
+   //  },
 	{"path" : "pages/news/chinaraces",
 			"style": {
 			        "navigationBarTitleText": "2025国内铁三赛事",
