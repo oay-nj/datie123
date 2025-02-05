@@ -98,7 +98,6 @@
 		    <div class="content">
 		      <div class="title">
 					 {{ race.title }} 
-
 		      </div>
 			  <div class="title-container">
 				  <div class="title-container-left">
@@ -924,6 +923,7 @@ export default {
 	  z-index: 1000; /* 确保它在其他内容之上 */
 	  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影效果，增强视觉层次 */
 	  display: flex;
+	  flex-direction: row;
 	  justify-content: center; /* 确保下拉框在一行内，并且间距均匀 */
 	  align-items: center;
 	  flex-wrap: nowrap; /* 强制不换行 */
@@ -1074,7 +1074,7 @@ export default {
 	  font-weight: bold;
 	  margin-bottom: 0px;
 	  margin-top: 8px;
-	  text-align: center;
+	  // text-align: center;
 	  color: white;        /* 设置文本颜色为白色 */
 	  font-family: 'Noto Sans CJK SC', '思源黑体', sans-serif; /* 使用正确的字体族属性 */
 	  font-size: 15px;
@@ -1104,10 +1104,10 @@ export default {
 	}
 	.title2 {
 	  margin-left: 10px;
-	  display: flex; /* 使用 Flexbox */
-	  align-items: center; /* 垂直居中对齐 */
+	  // display: flex; /* 使用 Flexbox */
+	  // align-items: center; /* 垂直居中对齐 */
 	  font-size: 11px;
-	  text-align: center;
+	  // text-align: center;
 	  color: white;        /* 设置文本颜色为白色 */
 	  font-family: 'Noto Sans CJK SC', '思源黑体', sans-serif; /* 使用正确的字体族属性 */
 	  height: 16px;
@@ -1117,15 +1117,18 @@ export default {
 	.title-container {
 		align-items: center; /* 垂直居中 */
 		display: flex; /* 使用 Flexbox */
-		width: 350px;
+		flex-direction: row;
+		justify-content: space-between;
+		// width: 350px;
 		height: 38px;
 		// margin-top: 2px;
 		margin-left: 20px;
 	}
 	.title-container-left {
-		// align-items: center; /* 垂直居中 */
-		// display: flex; /* 使用 Flexbox */
-		width: 260px;
+		align-items: center; /* 垂直居中 */
+		display: flex; /* 使用 Flexbox */
+		flex-direction: column;
+		// width: 260px;
 		height: 36px;
 		// margin-top: 2px;
 		// margin-left: 30px;
@@ -1133,39 +1136,45 @@ export default {
 	.title-container-left-detail {
 		align-items: center; /* 垂直居中 */
 		display: flex; /* 使用 Flexbox */
-		width: 260px;
+		flex-direction: row;
+		// width: 260px;
 		height: 18px;
 		// margin-top: 2px;
 		// margin-left: 30px;
 	}
 	.title-container-right {
+		justify-content: center;
 		align-items: center; /* 垂直居中 */
 		display: flex; /* 使用 Flexbox */
 		width: 40px;
 		height: 36px;
 		// margin-top: 2px;
-		margin-left: 45px;
+		margin-right: 17px;
 	}
 	.location-icon {
-	  height: 10px; /* 固定高度 */
-	  border-radius: 50%; /* 如果需要圆形图标 */
+	  width: 12px;
+	  height: 12px; /* 固定高度 */
+	  // border-radius: 50%; /* 如果需要圆形图标 */
 	  user-select: none; /* 禁止选择 */
 	  pointer-events: none; /* 禁止所有指针事件，包括右键菜单 */
 	  // filter: brightness(1000%) invert(1); /* 尝试将黑色变为白色 */
 	}
 	.race-details {
 	  display: flex; /* 使子元素水平排列 */
+	  flex-direction: row;
+	  justify-content: space-between;
 	  //align-items: center; /* 使左右部分垂直居中 *//
 	  height: 24px;
-	  width: 376px;
+	  // width: 376px;
 	  margin-top: 5px;
 	  // margin-left: 30px;
 	}
 	.race-details-left {
 	  display: flex; /* 使子元素水平排列 */
+	  flex-direction: row;
 	  align-items: center; /* 使左右部分垂直居中 */
 	  height: 24px;
-	  width: 200px;
+	  // width: 200px;
 	  margin-left: 10px;
 	  // margin-top: 8px;
 	}
@@ -1174,7 +1183,7 @@ export default {
 	  height: 24px;
 	  width: 140px;
 	  // margin-top: 8px;
-	  margin-left: 20px;
+	  margin-right: 16px;
 	}
 	
 	.detail-left {
