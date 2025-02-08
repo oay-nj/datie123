@@ -1,155 +1,84 @@
 <template>
-	<view class="box-bg">
-		<view class="custom-navigation" :style="{ top: statusBarHeight + 'px' }">
-			<view class="nav-back" @click="navigateBack">
-				<view style="flex-direction: row; align-items: center;">
-					<uni-icons type="back" size="24" color="#000000"></uni-icons>
-					<text class="back-text">返回</text>
-				</view>
-			</view>
-			<view class="nav-title">
-				<text class="title-text">{{pageTitle}}</text>
-			</view>
-		</view>
-		<view class="content" :style="{ paddingTop: (statusBarHeight + 44) + 'px' }">
-			<web-view 
-				class="webview-box" 
-				:src="url" 
-				@onPostMessage="handlePostMessage"
-			></web-view>
-		</view>
+	<view>
+		<web-view :src="url" @onPostMessage="handlePostMessage"></web-view>
 	</view>
 </template>
 
 <script>
-export default {
-	data() {
-		return {
-			url: 'about:blank',
-			pageTitle: '',
-			statusBarHeight: 20
-		}
-	},
-	onLoad(event) {
-		// 获取状态栏高度
-		this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-		
-		// 检查和处理 URL
-		if(event.query	) {
-			try {
-				this.url = decodeURIComponent(event.query);
-				console.log('Loading URL:', this.url);
-				
-				if (!this.url.startsWith('http://') && !this.url.startsWith('https://')) {
-					this.url = 'https://' + this.url;
+	export default {
+		data() {
+			return {
+				url: 'about:blank',
+				pageTitle: '',
+				statusBarHeight: 20
+			}
+		},
+		onLoad(event) {
+			// 获取状态栏高度
+			this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+
+			// 检查和处理 URL
+			if (event.query) {
+				try {
+					this.url = decodeURIComponent(event.query);
+					console.log('Loading URL:', this.url);
+
+					if (!this.url.startsWith('http://') && !this.url.startsWith('https://')) {
+						this.url = 'https://' + this.url;
+					}
+				} catch (e) {
+					console.error('URL decode error:', e);
+					uni.showToast({
+						title: 'URL格式错误',
+						icon: 'none'
+					});
 				}
-			} catch (e) {
-				console.error('URL decode error:', e);
+			} else {
+				console.error('No URL provided');
 				uni.showToast({
-					title: 'URL格式错误',
+					title: '未提供URL',
 					icon: 'none'
 				});
 			}
-		} else {
-			console.error('No URL provided');
-			uni.showToast({
-				title: '未提供URL',
-				icon: 'none'
-			});
-		}
-		
-		if(event.title) {
-			this.pageTitle = decodeURIComponent(event.title);
-		}
-	},
-	methods: {
-		navigateBack() {
-			uni.navigateBack();
+
+			if (event.title) {
+				this.pageTitle = decodeURIComponent(event.title);
+			}
 		},
-		handlePostMessage(event) {
-			console.log('PostMessage received:', event.detail);
-			if(event.detail.data && event.detail.data.title) {
-				// 如果从postMessage获取到标题就使用,否则尝试从网页标题获取
-				if (event.detail.data.title) {
-					this.pageTitle = event.detail.data.title;
-				} else {
-					// 通过webview获取网页标题
-					const webview = this.$refs.webview;
-					if (webview) {
-						webview.evaluate('document.title', (result) => {
-							if (result) {
-								this.pageTitle = result;
-							}
-						});
+		methods: {
+			navigateBack() {
+				uni.navigateBack();
+			},
+			handlePostMessage(event) {
+				console.log('PostMessage received:', event.detail);
+				if (event.detail.data && event.detail.data.title) {
+					// 如果从postMessage获取到标题就使用,否则尝试从网页标题获取
+					if (event.detail.data.title) {
+						this.pageTitle = event.detail.data.title;
+					} else {
+						// 通过webview获取网页标题
+						const webview = this.$refs.webview;
+						if (webview) {
+							webview.evaluate('document.title', (result) => {
+								if (result) {
+									this.pageTitle = result;
+								}
+							});
+						}
 					}
 				}
 			}
 		}
 	}
-}
 </script>
 
 <style>
-.box-bg {
-	flex: 1;
-	position: relative;
-	width: 750rpx;
-	height: 100vh;
-	background-color: #ffffff;
-}
+	.box-bg {
+		flex: 1;
+		flex-direction: column;
+	}
 
-.content {
-	flex: 1;
-	width: 750rpx;
-	height: 100vh;
-	background-color: #ffffff;
-}
-
-.webview-box {
-	flex: 1;
-	width: 750rpx;
-	height: calc(100vh - 44px - var(--status-bar-height));
-}
-
-.custom-navigation {
-	position: fixed;
-	left: 0;
-	right: 0;
-	height: 44px;
-	z-index: 999;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	background-color: #ffffff;
-	padding: 0 15px;
-	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
-}
-
-.nav-back {
-	display: flex;
-	align-items: center;
-	padding: 8px;
-}
-
-.back-icon {
-	width: 20px;
-	height: 20px;
-}
-
-.back-text {
-	font-size: 16px;
-	color: #333;
-	margin-left: 4px;
-}
-
-.nav-title {
-	flex: 1;
-	text-align: center;
-}
-
-.title-text {
-	font-size: 18px;
-	color: #333;
-	font-weight: 500;
-}
+	.webview-box {
+		flex: 1;
+	}
 </style>

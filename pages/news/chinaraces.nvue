@@ -1,6 +1,6 @@
 <template>
     <view class="box-bg">
-        <uni-nav-bar shadow :border="false" fixed>
+        <uni-nav-bar statusBar shadow :border="false" fixed>
             <!-- <template v-slot:left>
                 <view class="row_style" @click="goHome">
                     <image class="navi-left-image home-icon" src="/static/home.svg" mode="aspectFit"
@@ -20,7 +20,7 @@
         </uni-nav-bar>
 		<scroll-view class="content-scroll" scroll-y enable-pull-down-refresh 
 		@refresherrefresh="handlePullDownRefresh" :style="{ minHeight: '100px' }" enable-flex>
-			<div class="filter-row" >
+			<div class="filter-row" :style="{top: navBarHeight + 'px'}" >
 				<view class="filter-item" >
 					<view @click="toggleDropdown('Region')"
 						  class="picker-text" > 
@@ -153,6 +153,7 @@ export default {
 	
 	data() {
 		return {
+		  navBarHeight:64,
 		  regions: [], // 主办方
 		  statuses: [], // 赛事状态
 		  months: this.generateMonths(),
@@ -586,9 +587,7 @@ export default {
 		       break;
 		     case 'mp-weixin':
 		       console.log('当前环境是微信小程序');
-		       uni.navigateTo({
-		         url: url
-		       });
+		       uni.navigateTo({url: '/pages/news/detail?query=' + encodeURIComponent(url)});
 		       break;
 		     default:
 		       console.log('未知环境');
@@ -632,9 +631,28 @@ export default {
 		 				console.log("EEEE", result);
 		 			});
 		 },
+		 calculateNavBarHeight() {
+		       // 获取系统信息
+		       uni.getSystemInfo({
+		           success: (e) => {
+		               const statusBarHeight = e.statusBarHeight; // 状态栏高度
+		               let navigationBarHeight = 0;
+		       
+		               // 根据平台设置默认导航栏高度
+		               if (e.platform === 'android') {
+		                   navigationBarHeight = 48; // iOS 默认导航栏高度
+		               } else {
+		                   navigationBarHeight = 44; // Android 默认导航栏高度
+		               }
+		               this.navBarHeight = statusBarHeight + navigationBarHeight;
+		               console.log('导航栏总高度：', totalNavigationBarHeight);
+		           }
+		       });
+		     },
 	},
   onReady() {
 	  // 在组件挂载后调用 fetchRaceData 方法
+	  this.calculateNavBarHeight();
 	  this.fetchRaceDatanit();	  
 	  this.checkWeChatEnvironment();
 	  this.loadWeChatSDK();
@@ -916,7 +934,6 @@ export default {
 	.filter-row {
 	  // position: fixed;
 	  position: fixed;
-	  top: 40px;
 	  left: 0;
 	  width: 100%;
 	  // background-color: white; /* 防止背景透明导致下面的内容可见 */
@@ -1019,11 +1036,9 @@ export default {
 	//以下为赛事详情布局
 	.races-container {
 	  display: flex;
-	  flex-wrap: wrap; /* 允许换行 */
-	  gap: 10px; /* 控制项目之间的间距 */
 	  justify-content: center; /* 使子项居中 */
 		  // padding: 10px;
-	  margin-top: 35px; /* 这个值应该等于 .filter-row 的高度 */
+	  margin-top: 45px; /* 这个值应该等于 .filter-row 的高度 */
 	  overflow-y: auto; /* 如果需要滚动 */
 	  padding: 5px;
 	  
@@ -1032,8 +1047,7 @@ export default {
 	}
 	
 	.race-item {
-	  width: 376px;
-	  height: 110;
+	  height: 110px;
 	  border: 1px solid #ccc; /* 设置边框 */
 	  border-radius: 10px; /* 设置圆角 */
 	  margin-bottom: 5px;
@@ -1062,14 +1076,12 @@ export default {
 	.content {
 	border: 1px solid #ccc; /* 设置边框 */
 	border-radius: 10px; /* 设置圆角 */
-	width:376px;
 	height: 110px;
 	position: relative;
 	z-index: 2; /* 确保内容在遮罩层之上 */
 	}
 	.title {
 	  display: flex; /* 使用 Flexbox */
-	  width: 345px;
 	  border-radius: 10px; /* 设置圆角 */
 	  font-weight: bold;
 	  margin-bottom: 0px;
@@ -1086,7 +1098,6 @@ export default {
 	  display: flex; /* 使用 Flexbox */
 	  align-items: center; /* 垂直居中 */
 	  // justify-content: center; /* 水平居中 */
-	  width: 358px;  
 	  border-radius: 10px; /* 设置圆角 */
 	  font-size: 15px;
 	  font-weight: bold;
@@ -1111,7 +1122,6 @@ export default {
 	  color: white;        /* 设置文本颜色为白色 */
 	  font-family: 'Noto Sans CJK SC', '思源黑体', sans-serif; /* 使用正确的字体族属性 */
 	  height: 16px;
-	  width: 250px;
 	}
 	
 	.title-container {
@@ -1125,7 +1135,6 @@ export default {
 		margin-left: 20px;
 	}
 	.title-container-left {
-		align-items: center; /* 垂直居中 */
 		display: flex; /* 使用 Flexbox */
 		flex-direction: column;
 		// width: 260px;
@@ -1181,7 +1190,6 @@ export default {
 	.race-details-right {
 	  align-items: center; 
 	  height: 24px;
-	  width: 140px;
 	  // margin-top: 8px;
 	  margin-right: 16px;
 	}
