@@ -645,7 +645,6 @@ export default {
 		                   navigationBarHeight = 44; // Android 默认导航栏高度
 		               }
 		               this.navBarHeight = statusBarHeight + navigationBarHeight;
-		               console.log('导航栏总高度：', totalNavigationBarHeight);
 		           }
 		       });
 		     },
