@@ -11,12 +11,12 @@
                 <image class="input-view" src="/static/racesbar.png" mode="aspectFit"
                 />
             </view>
-            <template v-slot:left>
+            <!-- <template v-slot:left>
                 <button class="share-button" @click="handleShare" >
                     <image class="navi-left-image home-icon" src="/static/ironcat.jpg" mode="aspectFit">
                     </image>		
                 </button>
-            </template>
+            </template> -->
         </uni-nav-bar>
 		<scroll-view class="content-scroll" scroll-y enable-pull-down-refresh 
 		@refresherrefresh="handlePullDownRefresh" :style="{ minHeight: '100px' }" enable-flex>
@@ -58,9 +58,11 @@
 		    <!-- 内容 -->
 		    <div class="content">
 		      <div class="main-title-container">
-				  <div class="title">{{ race.title }}</div>
+				  <div class="title">
+				      <span class="text">{{ race.title }}</span>
+				  </div>
 				   <img 
-				          :src="race.isNotFavorited ? '/static/未订阅.svg' : '/static/已订阅.svg'" 
+				          :src="race.isNotFavorited ? '/static/通知-已订阅.svg' : '/static/通知-未订阅.svg'" 
 				          alt="收藏图标" 
 				          class="favorites-icon" 
 				          @click="checkAuthorization(race)" 
@@ -109,9 +111,10 @@
 		  </div>
 		</div>	
 		</scroll-view>
-		<view class="beian-container">
+		<official-account></official-account>
+		<!-- <view class="beian-container">
 			<text class="beian-text" @click="openBeianLink">苏ICP备2022016640号-3</text>
-		</view>
+		</view> -->
 	</view>
 </template>
 
@@ -133,6 +136,9 @@ export default {
 		   
 		  races: [] ,// 存储赛事数据，
 		  filterRaces: [] ,// 存储过滤后的赛事数据，
+		  
+		  wxAppId: "",//微信小程序appid
+		  wxSecretKey: "",//微信小程序密钥
 		  
 		  isWeChat: false, // 标记是否为微信环境
 		  // 微信分享的配置
@@ -415,9 +421,7 @@ export default {
 							  console.error('请求微信JS-SDK配置失败:', error);
 							}
 				});
-			}else(
-			console.error('当前非微信环境')
-			)		
+			}	
 		},
 		initWeChatSDK() {		
 			// console.error('获取到的配置数据:', this.configData);
@@ -530,21 +534,35 @@ export default {
 			 
 		 async addSingleStaticsDetail(item) {
 		   const currentTime = new Date().toLocaleString();
+		   // 获取设备信息
+		   const systemInfo = uni.getSystemInfoSync();
+		   
+		   // 获取设备型号
+		   const deviceModel = systemInfo.model;
+		   
+		   // console.log('设备型号：', deviceModel);
 		   let detailInfo = {
 		     entry_id: item.entry_id,
 		     element_id: '赛事详情',
-		     click_time: currentTime
-		   }
+		     click_time: currentTime,
+			 user_id:'',
+			 page_id:'2025国内铁人三项赛事',
+			 openid:wx.getStorageSync('openid'),
+			 unionid:wx.getStorageSync('unionid'),
+			 device_id:deviceModel,
+			 ip:'',
+			 channel:'微信小程序'
+			 }
 		 
 		   try {
 		     const result = await uni.request({
-		       url: 'https://datie123.com/entry/addSingleStaticsDetail',
+		       url: 'https://www.datie123.com/entry/addSingleStaticsDetail',
 		       method: 'POST',
 		       data: {
 		         statics_detail: detailInfo,
 		       }
 		     });
-		     console.log("请求结果", result);
+		     // console.log("请求结果", result);
 		   } catch (error) {
 		     console.error("请求失败", error);
 		   }
@@ -573,6 +591,7 @@ export default {
 		 },
 
 		 addSingleStaticsDetailShare() {
+			 
 		 			const currentTime = new Date().toLocaleString();
 		 			let detailInfo = {
 		 				// entry_id: item.entry_id,
@@ -580,7 +599,7 @@ export default {
 		 				click_time: currentTime
 		 			}
 		 			uni.request({
-		 				url: 'https://datie123.com/entry/addSingleStaticsDetail',
+		 				url: 'https://www.datie123.com/entry/addSingleStaticsDetail',
 		 				method: 'POST',
 		 				data: {
 		 					statics_detail: detailInfo,
@@ -591,12 +610,24 @@ export default {
 		 },
 		 addSingleStaticsDetailInit() {
 		 			const currentTime =new Date();
+					// 获取设备信息
+					const systemInfo = uni.getSystemInfoSync();				
+					// 获取设备型号
+					const deviceModel = systemInfo.model;
 		 			let detailInfo = {
 		 				page_id: '2025国内铁人三项赛事',
-		 				click_time: currentTime.toLocaleString()
+		 				click_time: currentTime.toLocaleString(),
+						// entry_id: item.entry_id,
+						// element_id: '赛事详情',
+						user_id:'',
+						openid:wx.getStorageSync('openid'),
+						unionid:wx.getStorageSync('unionid'),
+						device_id:deviceModel,
+						ip:'',
+						channel:'微信小程序'
 		 			}
 		 			uni.request({
-		 				url: 'https://datie123.com/entry/addSingleStaticsDetail',
+		 				url: 'https://www.datie123.com/entry/addSingleStaticsDetail',
 		 				method: 'POST',
 		 				data: {
 		 					statics_detail: detailInfo,
@@ -636,7 +667,7 @@ export default {
 				 const openid = wx.getStorageSync('openid');
 				 const unionid = wx.getStorageSync('unionid');
 				 const status = race.isNotFavorited ? 0 : 1; // 订阅为1，取消订阅为0
-				 if (openid) {
+				 if (unionid) {
 					 //保存订阅信息
 					 that.saveUserInfo(openid, unionid,race.entry_id,status,race);
 				 } else {
@@ -664,47 +695,46 @@ export default {
 				   }
 			   },
 			   checkAuthorizationInit() {
-				   console.log('调用checkAuthorizationInit')
 				 const that = this;
 				 // 尝试从本地缓存中获取 openid 和 unionid
 				 const openid = wx.getStorageSync('openid');
 				 const unionid = wx.getStorageSync('unionid');	 
-				 if (openid) {
+				 if (unionid) {
 					 // 如果本地缓存中有 openid 和 unionid，则直接使用
-					 console.error('从本地缓存读取的 OpenID:', openid);
-					 console.error('从本地缓存读取的 UnionID:', unionid);
+					 // console.error('从本地缓存读取的 OpenID:', openid);
+					 // console.error('从本地缓存读取的 UnionID:', unionid);
 					 that.getDingyueInfoInit(openid, unionid);
 				 } else {
 					console.error('本地缓存无信息');
 					uni.getSetting({
-					   success(res) {
-						   if (res.authSetting['scope.userInfo']) {
-							   // 用户已授权，调用微信登录获取 openid 和 unionid
-							   console.error('用户已授权，调用微信登录获取 openid 和 unionid')
-								   wx.login({
-									   success(resLogin) {
-										   if (resLogin.code) {
-											   console.error(resLogin.code)
-											   that.getWechatOpenidInit(resLogin.code);
-											   
-										   } else {
-											   console.error('登录失败！' + resLogin.errMsg);
+						   success(res) {
+							   if (res.authSetting['scope.userInfo']) {
+								   // 用户已授权，调用微信登录获取 openid 和 unionid
+								   console.error('用户已授权，调用微信登录获取 openid 和 unionid')
+									   wx.login({
+										   success(resLogin) {
+											   if (resLogin.code) {
+												   // console.error(resLogin.code)
+												   that.getWechatOpenidInit(resLogin.code);
+												   
+											   } else {
+												   console.error('登录失败！' + resLogin.errMsg);
+											   }
 										   }
-									   }
-								   });						   
-						   } else {
-							   // 未授权，调用微信授权
-							   // that.authorizeWechat(race);
-						   }
-					   }
-				    });
+									   });						   
+							   } else {
+								   // 未授权，调用微信授权
+								   // that.authorizeWechat(race);
+							   }
+							}
+						});
 					}
 			     },
 			   getDingyueInfo(){
 				   console.error('调用getDingyueInfo')
 				   console.error(wx.getStorageSync('openid'));
 				   uni.request({
-					 url: 'http://localhost:8081/entry/queryByOpenidAndUnionId', // API URL
+					 url: 'https://www.datie123.com/entry/queryByOpenidAndUnionId', // API URL
 					 method: 'GET',
 						data: {
 							openid: wx.getStorageSync('openid'),
@@ -739,7 +769,7 @@ export default {
 				   });
 			   },
 			   getDingyueInfoInit(openid,unionid){
-				   console.info('调用getDingyueInfoInit')
+				   // console.info('调用getDingyueInfoInit')
 				   uni.request({
 					 url: 'https://www.datie123.com/entry/queryByOpenidAndUnionId', // API URL
 					 method: 'GET',
@@ -789,20 +819,7 @@ export default {
 							   uni.showToast({ title: '授权已取消', icon: 'none' });
 							 }
 					        }
-					      });
-				   //这里是引导用户进行微信授权的代码
-				   // uni.login({
-					  //  provider: 'weixin', // 指定微信登录
-					  //  success: (res) => {
-						 //   if (res.code) {
-							//    // console.error(res.code)
-							//    // 获取登录凭证（code）
-							//    this.getWechatOpenid(res.code);
-						 //   } else {
-							//    console.log('登录失败！' + res.errMsg);
-						 //   }
-					  //  }
-				   // });
+					      });				   
 			   },
 		   // 
 			   // 登录并获取用户信息
@@ -825,36 +842,31 @@ export default {
 				   uni.showToast({ title: '获取失败', icon: 'none' });
 				 }
 			   },
-			   getWechatOpenidInit(code) {
-				   
-				   console.error('调用getWechatOpenid')
+			   getWechatOpenidInit(code) {			   
+				   // console.error('调用getWechatOpenidInit')
 				   uni.request({
-					   url: 'https://api.weixin.qq.com/sns/jscode2session', // 微信开放平台接口
+					   url: 'https://www.datie123.com/wechat/getOpenid', // 你的后台接口地址
+					   method: 'POST',
 					   data: {
-						   appid: 'wxbf6fd294c3e2400a',
-						   secret: 'c8891e03db2ea912a09585ff35e1c427',
-						   // appid: 'wxb301a1d4a36e96db',					   
-						   // secret:'76e5b68e57f062591041e2bb08dadac4',
-						   js_code: code,
-						   grant_type: 'authorization_code'
+						   code: code
 					   },
 					   success: (res) => {
-								   console.error(res.data);
-								   if (res.statusCode === 200 && res.data.openid) {
-									   console.error('成功获取到 openid ');
-									   wx.setStorageSync('openid', res.data.openid);
-								   } else {
-									   console.error('获取 OpenID 失败！响应:', res.data);
-								   }
-								   if (res.data.unionid) {
-									   console.error('成功获取到 unionid ');
-									   wx.setStorageSync('unionid', res.data.unionid);
-								   } else {
-									   console.log('获取 unionid 失败！');
-								   }
-								   this.getDingyueInfoInit(wx.getStorageSync('openid'),
-								   			wx.getStorageSync('unionid'));
-							   },
+						   console.error(res.data);
+						   if (res.statusCode === 200 && res.data.openid) {
+							   console.error('成功获取到 openid ');
+							   wx.setStorageSync('openid', res.data.openid);
+						   } else {
+							   console.error('获取 OpenID 失败！响应:', res.data);
+						   }
+						   if (res.data.unionid) {
+							   console.error('成功获取到 unionid ');
+							   wx.setStorageSync('unionid', res.data.unionid);
+						   } else {
+							   console.log('获取 unionid 失败！');
+						   }
+						   this.getDingyueInfoInit(wx.getStorageSync('openid'),
+									wx.getStorageSync('unionid'));
+					   },
 					   fail: (err) => {
 						   console.error('请求失败:', err);
 					   }
@@ -863,14 +875,10 @@ export default {
 			   getWechatOpenid(code) {			   				   
 				   console.error('调用getWechatOpenid')
 				   uni.request({
-					   url: 'https://api.weixin.qq.com/sns/jscode2session', // 微信开放平台接口
+					   url: 'https://www.datie123.com/wechat/getOpenid', // 你的后台接口地址
+					   method: 'POST',
 					   data: {
-						   appid: 'wxbf6fd294c3e2400a',
-						   secret: 'c8891e03db2ea912a09585ff35e1c427',
-						   // appid: 'wxb301a1d4a36e96db',					   
-						   // secret:'76e5b68e57f062591041e2bb08dadac4',
-						   js_code: code,
-						   grant_type: 'authorization_code'
+						   code: code
 					   },
 					   success: (res) => {
 						   console.error(res.data);
@@ -894,14 +902,17 @@ export default {
 				   });
 			   },
 			   saveUserInfo(openid, unionid,entryid,status,race) {
-
-					   wx.requestSubscribeMessage({
-						   tmplIds: ['ycORe8--kFzEp5K2Ty2XJmYdXp1Fkzb_US7pI7kac6s'],
-						   success(res) {
-							   console.log('用户选择的结果:', res);   
-							   if (res[templateId] === 'accept') {
+				   // console.error(status);
+					   if(status=='1'){
+						// console.error('当前为添加订阅');
+						 wx.requestSubscribeMessage({
+						   tmplIds: ['ycORe8--kFzEp5K2Ty2XJgYzIC7Kml1wuaNcLmU6TCo'],
+						   success: (res) => {
+							   // console.error('用户选择的结果:', res); 
+								 const that = this;
+							   if (res['ycORe8--kFzEp5K2Ty2XJgYzIC7Kml1wuaNcLmU6TCo'] === 'accept') {
 								   uni.request({
-									   url: 'http://localhost:8081/entry/updateSubscription', // 替换成你的服务器地址
+									   url: 'https://www.datie123.com/entry/updateSubscription', 
 									   method: 'GET',
 									   data: {
 										   openid: openid,
@@ -913,7 +924,8 @@ export default {
 										   if (res.statusCode === 200) {
 											   // 更新收藏状态
 											   const newStatus = status === 0; // true 表示订阅，false 表示取消订阅
-											   this.updateRaceList(entryid, newStatus);						   
+											   // 遍历 filterRaces 和 races 列表，更新对应的 isNotFavorited 状态
+											   	this.updateRaceList(entryid, newStatus);				   
 											   // 显示对应的提示信息
 											   wx.showToast({
 												   title: status === 1 ? "订阅成功" : "取消订阅成功",
@@ -935,7 +947,7 @@ export default {
 								   // 可以在这里执行一些操作，比如更新数据库中的用户订阅状态
 							   } else {
 									uni.request({
-									   url: 'http://localhost:8081/entry/updateSubscription', // 替换成你的服务器地址
+									   url: 'https://www.datie123.com/entry/updateSubscription', // 替换成你的服务器地址
 									   method: 'GET',
 									   data: {
 										   openid: openid,
@@ -973,80 +985,65 @@ export default {
 								   });
 							   }
 						   },
-						   fail(err) {
+						   fail: (err) => {
 							   console.error('请求订阅消息失败', err);
 							   uni.showToast({
 								   title: '请求订阅消息失败，请稍后再试',
 								   icon: 'none'
 							   });
 						   }
-					   });
-					   uni.request({
-					   									   url: 'http://localhost:8081/entry/updateSubscription', // 替换成你的服务器地址
-					   									   method: 'GET',
-					   									   data: {
-					   										   openid: openid,
-					   										   unionid: unionid,
-					   										   entry_id: entryid,
-					   										   status: status // 1 表示订阅，0 表示取消订阅
-					   									   },
-					   									   success: (res) => {
-					   										   if (res.statusCode === 200) {
-					   											   // 更新收藏状态
-					   											   const newStatus = status === 0; // true 表示订阅，false 表示取消订阅
-					   											   this.updateRaceList(entryid, newStatus);						   
-					   											   // 显示对应的提示信息
-					   											   wx.showToast({
-					   												   title: status === 1 ? "订阅成功" : "取消订阅成功",
-					   												   icon: 'success',
-					   												   duration: 2000
-					   											   });
-					   											   } else {
-					   												   console.error('订阅失败:', res);
-					   											   }
-					   									   },
-					   									   fail: (err) => {
-					   										   wx.showToast({
-					   											   title: status === 1 ? "订阅失败" : "取消订阅失败",
-					   											   icon: 'none',
-					   											   duration: 2000
-					   										   });
-					   										}
-					   									});								   
-				   
+						 });
+					   }else{
+						   // console.error('当前为取消订阅') ;
+						   uni.request({
+							   url: 'https://www.datie123.com/entry/updateSubscription', // 替换成你的服务器地址
+							   method: 'GET',
+							   data: {
+								   openid: openid,
+								   unionid: unionid,
+								   entry_id: entryid,
+								   status: status // 1 表示订阅，0 表示取消订阅
+							   },
+							   success: (res) => {
+								   if (res.statusCode === 200) {
+									   // 更新收藏状态
+									   const newStatus = status === 0; // true 表示订阅，false 表示取消订阅
+									   this.updateRaceList(entryid, newStatus);						   
+									   // 显示对应的提示信息
+									   wx.showToast({
+										   title: status === 1 ? "订阅成功" : "取消订阅成功",
+										   icon: 'success',
+										   duration: 2000
+									   });
+									   } else {
+										   console.error('订阅失败:', res);
+									   }
+							   },
+							   fail: (err) => {
+								   wx.showToast({
+									   title: status === 1 ? "订阅失败" : "取消订阅失败",
+									   icon: 'none',
+									   duration: 2000
+								   });
+								}
+							});	
+					   }
+					   						   		   
 			   },
-			   updateRaceList(entryId, newStatus) {
-			           // 遍历 filterRaces 和 races 列表，更新对应的 isNotFavorited 状态
-			           this.filterRaces.forEach(r => {
-			               if (r.entry_id === entryId) {
-			                   r.isNotFavorited = !newStatus; // 注意这里使用 !newStatus 是因为 isNotFavorited 在订阅时应为 false，取消订阅时应为 true
-			               }
-			           });
-			           this.races.forEach(r => {
-			               if (r.entry_id === entryId) {
-			                   r.isNotFavorited = !newStatus;
-			               }
-			           });
-			       },
-			   // 调用微信订阅消息接口
-				addSubscription() {
-				   uni.requestSubscribeMessage({
-					   tmplIds: ['your-template-id'],  // 填入你订阅消息模板的 ID
-					   success(res) {
-						   if (res['your-template-id'] === 'accept') {
-							   // 用户同意订阅
-							   console.log('用户已同意订阅消息');
-						   } else {
-							   // 用户拒绝订阅
-							   console.log('用户拒绝订阅消息');
-						   }
-					   },
-					   fail(error) {
-						   console.log('订阅消息失败:', error);
+		   updateRaceList(entryId, newStatus) {
+			   // console.error('------调用updateRaceList')
+				   // 遍历 filterRaces 和 races 列表，更新对应的 isNotFavorited 状态
+				   this.filterRaces.forEach(r => {
+					   if (r.entry_id === entryId) {
+						   r.isNotFavorited = !newStatus; // 注意这里使用 !newStatus 是因为 isNotFavorited 在订阅时应为 false，取消订阅时应为 true
+					   }
+				   });
+				   this.races.forEach(r => {
+					   if (r.entry_id === entryId) {
+						   r.isNotFavorited = !newStatus;
 					   }
 				   });
 			   },
-			   
 	},
      onLoad() {
 	  // 在组件挂载后调用 fetchRaceData 方法
@@ -1055,7 +1052,25 @@ export default {
 	  this.checkWeChatEnvironment();
 	  this.loadWeChatSDK();
 	  this.addSingleStaticsDetailInit();
-	}
+	// 显示右上角的转发按钮
+	    uni.showShareMenu({
+	      withShareTicket: true,
+	      menus: ['shareAppMessage', 'shareTimeline']
+	    })
+	  },
+	  onShareAppMessage() {
+	    return {
+	      title: '2025国内铁三赛事',
+	      path: '/pages/news/chinaraces', // 注意替换为你的页面路径
+	      imageUrl: 'https://www.datie123.com/images/datie-ironcat.jpg' // 可选
+	    }
+	  },
+	  onShareTimeline() {
+	      return {
+	        title: '2025国内铁三赛事',
+			imageUrl: 'https://www.datie123.com/images/datie-ironcat.jpg' // 可选
+	      }
+	    }
 }
 </script>
 
@@ -1179,7 +1194,7 @@ export default {
 		// background-color: aqua;
 		align-items: center;
 		height: 100%;
-		width: 400rpx;
+		width: 420rpx;
 		// width: 160rpx;
 		// margin-left: 4px;
 	}
@@ -1466,8 +1481,8 @@ export default {
 	}
 	
 	.race-item {
-	  min-height: 110px;
-	  max-height: 152px;
+	  height: 110px;
+	  // max-height: 152px;
 	  border: 1px solid #ccc; /* 设置边框 */
 	  border-radius: 10px; /* 设置圆角 */
 	  margin-bottom: 5px;
@@ -1496,8 +1511,9 @@ export default {
 	.content {
 	border: 1px solid #ccc; /* 设置边框 */
 	border-radius: 10px; /* 设置圆角 */
-	min-height: 110px;
-	max-height: 132px;
+	height: 110px;
+	// min-height: 110px;
+	// max-height: 132px;
 	position: relative;
 	z-index: 2; /* 确保内容在遮罩层之上 */
 	}
@@ -1518,16 +1534,34 @@ export default {
 	  font-family: 'Noto Sans CJK SC', '思源黑体', sans-serif; /* 使用正确的字体族属性 */
 	  font-size: 15px;
 	  min-height: 22px;
-	  max-width: 40;
-	  margin-left: 20px;
+	  margin-left: 16px;
 	  margin-top: 10px;
+	  /* 设置固定宽度 */
+	  max-width: 320px;
+	  /* 确保元素内的文本不会换行 */
+	  white-space: nowrap;
+	  /* 超出部分隐藏 */
+	  overflow: hidden;
+	}
+	
+	.text {
+	    /* 设置文本的最大宽度 */
+	    max-width: 300px;
+	    /* 确保文本不会换行 */
+	    white-space: nowrap;
+	    /* 超出部分隐藏 */
+	    overflow: hidden;
+	    /* 使用省略号代替超出部分 */
+	    text-overflow: ellipsis;
+	    /* 可选：根据设计需求调整 display 属性 */
+	    display: inline-block;
 	}
 		
 	.favorites-icon {
 		margin-top: 10px;
 		margin-right: 20px;
-	  width: 28px;         /* 设置图标的宽度 */
-	  height: 28px;        /* 设置图标的高度 */
+	  width: 25px;         /* 设置图标的宽度 */
+	  height: 25px;        /* 设置图标的高度 */
 	}
 	.title-bar {
 		// border: 1px solid #ccc; /* 设置边框 */
@@ -1546,11 +1580,11 @@ export default {
 	  height: 30px;
 	}
 	.img-icon{
-		height: 32px;
-		width: 32px;
+		height: 30px;
+		width: 30px;
 	}
 	.title2 {
-	  margin-left: 10px;
+	  margin-left: 6px;
 	  // display: flex; /* 使用 Flexbox */
 	  // align-items: center; /* 垂直居中对齐 */
 	  font-size: 11px;
@@ -1568,7 +1602,7 @@ export default {
 		// width: 350px;
 		height: 33px;
 		// margin-top: 2px;
-		margin-left: 20px;
+		margin-left: 16px;
 	}
 	.title-container-left {
 		// display: flex; /* 使用 Flexbox */
@@ -1600,8 +1634,8 @@ export default {
 		justify-content: center;
 		align-items: center; /* 垂直居中 */
 		display: flex; /* 使用 Flexbox */
-		width: 40px;
-		height: 36px;
+		width: 30px;
+		height: 33px;
 		// margin-top: 2px;
 		margin-right: 8px;
 	}
@@ -1694,49 +1728,52 @@ export default {
 		// margin-left: 50%;
 	}
 	.bottom-row-text{
-	  width:70px;
+	  width:80px;
 	  height: 18px; 
 	  line-height: 18px; 
-	  color: #E10225; 
-	  background-color: #FDEFEF; 
+	  color:#FDEFEF ; 
+	  background-color: #E10225; 
 	  text-align: center; 
-	  font-size: 10px; 
+	  font-size: 12px; 
+	  font-weight: bold;
 	  overflow: hidden; 
 	  white-space: nowrap; 
-	  margin-left: 10px;
+	  margin-left: 6px;
 	  border-radius: 2px; 
 	  font-family: 'Noto Sans CJK SC', '思源黑体', sans-serif;
 }
 	
 	.bottom-row-text2{
 	  min-width: 30px;
-	  max-width:60px;
+	  max-width:70px;
 	  height: 18px; 
 	  line-height: 18px; 
 	  color: #E10225;
 	  background-color: #FDEFEF; 
 	  text-align: center; 
-	  font-size: 11px; 
+	  font-size: 12px; 
+	  font-weight: bold;
 	  overflow: hidden; 
 	  white-space: nowrap; 
 	  margin-left: 10px;
-	  border-radius: 4px; 
+	  border-radius: 2px; 
 	  padding: 0 3px; /* 添加左右内边距 */
 	  font-family: 'Noto Sans CJK SC', '思源黑体', sans-serif; 
 	}
 	.bottom-row-text3{
 		  min-width: 15px;
-		  max-width:40px;
+		  max-width:50px;
 		  height: 18px; /* 设置高度为18像素 */
 		  line-height: 18px; /* 确保文本垂直居中 */
 		  color: #E10225; /* 设置字体颜色 */
 		  background-color: #FDEFEF; /* 设置背景颜色 */
 		  text-align: center; /* 水平居中文本 */
-		  font-size: 11px; /* 根据需要调整字体大小以适应容器 */
+		  font-size: 12px; /* 根据需要调整字体大小以适应容器 */
+		  font-weight: bold;
 		  overflow: hidden; /* 防止内容溢出 */
 		  white-space: nowrap; /* 防止文本换行 */
 		  margin-left: 10px;
-		  border-radius: 4px; /* 设置圆角 */
+		  border-radius: 2px; /* 设置圆角 */
 		  padding: 0 3px; /* 添加左右内边距 */
 		  font-family: 'Noto Sans CJK SC', '思源黑体', sans-serif; /* 使用正确的字体族属性 */
 	}
@@ -1746,7 +1783,7 @@ export default {
 		  color: white; /* 设置字体颜色 */
 		  background-color: #E10225; /* 设置背景颜色 */
 		  text-align: center; /* 水平居中文本 */
-		  font-size: 15px; /* 根据需要调整字体大小以适应容器 */
+		  font-size: 14px; /* 根据需要调整字体大小以适应容器 */
 		  overflow: hidden; /* 防止内容溢出 */
 		  white-space: nowrap; /* 防止文本换行 */
 		  margin-left: 58px;
