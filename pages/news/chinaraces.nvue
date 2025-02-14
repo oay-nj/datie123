@@ -162,6 +162,8 @@ export default {
 		  openid: '', // 初始化为空
 		  unionid: '' ,// 初始化为空
 		  
+		  tmplIds: ['ycORe8--kFzEp5K2Ty2XJgYzIC7Kml1wuaNcLmU6TCo', 'OhoznUD4OfUo-CYjS1hMQ4ECDymyVK8l25JZnAhB9QE', '1oejuHtf353pPTUblhoqfToXl8d1wN2o60eVuLqMsE8'],
+		  acceptedTmplIds: [], // 用于存储用户同意的模板消息ID
 		};
 	  },
 	  onPullDownRefresh() {
@@ -704,6 +706,7 @@ export default {
 					 // console.error('从本地缓存读取的 OpenID:', openid);
 					 // console.error('从本地缓存读取的 UnionID:', unionid);
 					 that.getDingyueInfoInit(openid, unionid);
+					 this.saveUserProfilesInfo(openid, unionid);
 				 } else {
 					console.error('本地缓存无信息');
 					uni.getSetting({
@@ -738,7 +741,8 @@ export default {
 					 method: 'GET',
 						data: {
 							openid: wx.getStorageSync('openid'),
-							unionid: wx.getStorageSync('unionid'),					
+							unionid: wx.getStorageSync('unionid'),	
+							channel: 'wx-app',
 						},
 					 success: (res) => {
 					   if (res.statusCode === 200 && res.data) {						
@@ -775,7 +779,8 @@ export default {
 					 method: 'GET',
 						data: {
 							openid: openid,
-							unionid: unionid,					
+							unionid: unionid,
+							channel: 'wx-app',											
 						},
 					 success: (res) => {
 					   if (res.statusCode === 200 && res.data) {						
@@ -795,6 +800,28 @@ export default {
 					   } else {
 						 console.error('API request failed:', res);
 					   }
+					 },
+					 fail: (err) => {
+					   console.error('Failed to fetch race data:', err);
+					 }
+				   });
+			   },
+			   saveUserProfilesInfo(openid,unionid){
+				   // console.info('调用getDingyueInfoInit')
+				   uni.request({
+					 url: 'https://www.datie123.com/entry/addOrUpdateUserProfile', // API URL
+					 method: 'POST',
+					 header: {
+					         'Content-Type': 'application/json' // 设置请求头为 application/json
+					     },
+					data: {
+						openid: openid,
+						unionid: unionid,
+						channel: 'wx-app',											
+					},
+					 success: (res) => {
+					   console.error('保存成功')
+
 					 },
 					 fail: (err) => {
 					   console.error('Failed to fetch race data:', err);
@@ -845,7 +872,7 @@ export default {
 			   getWechatOpenidInit(code) {			   
 				   // console.error('调用getWechatOpenidInit')
 				   uni.request({
-					   url: 'https://www.datie123.com/wechat/getOpenid', // 你的后台接口地址
+					   url: 'https://www.datie123.com/entry/getOpenid', // 你的后台接口地址
 					   method: 'POST',
 					   data: {
 						   code: code
@@ -866,6 +893,8 @@ export default {
 						   }
 						   this.getDingyueInfoInit(wx.getStorageSync('openid'),
 									wx.getStorageSync('unionid'));
+						   this.saveUserProfilesInfo(wx.getStorageSync('openid'),
+									wx.getStorageSync('unionid'));
 					   },
 					   fail: (err) => {
 						   console.error('请求失败:', err);
@@ -875,7 +904,7 @@ export default {
 			   getWechatOpenid(code) {			   				   
 				   console.error('调用getWechatOpenid')
 				   uni.request({
-					   url: 'https://www.datie123.com/wechat/getOpenid', // 你的后台接口地址
+					   url: 'https://www.datie123.com/entry/getOpenid', // 你的后台接口地址
 					   method: 'POST',
 					   data: {
 						   code: code
@@ -902,15 +931,22 @@ export default {
 				   });
 			   },
 			   saveUserInfo(openid, unionid,entryid,status,race) {
-				   // console.error(status);
+				   this.saveUserProfilesInfo(openid, unionid);
 					   if(status=='1'){
-						// console.error('当前为添加订阅');
+						console.error('当前为添加订阅');
 						 wx.requestSubscribeMessage({
-						   tmplIds: ['ycORe8--kFzEp5K2Ty2XJgYzIC7Kml1wuaNcLmU6TCo'],
+						   tmplIds: ['ycORe8--kFzEp5K2Ty2XJgYzIC7Kml1wuaNcLmU6TCo','OhoznUD4OfUo-CYjS1hMQ4ECDymyVK8l25JZnAhB9QE','1oejuHtf353pPTUblhoqfToXl8d1wN2o60eVuLqMsE8'],
 						   success: (res) => {
-							   // console.error('用户选择的结果:', res); 
+							   console.error('用户选择的结果:', res); 
+							   let acceptedTmplIds = [];	   
+							       // 遍历所有模板ID并检查用户是否接受订阅
+							       for (let tmplId in res) {
+							         if (res.hasOwnProperty(tmplId) && res[tmplId] === 'accept') {
+							           acceptedTmplIds.push(tmplId);
+							         }
+							       }
 								 const that = this;
-							   if (res['ycORe8--kFzEp5K2Ty2XJgYzIC7Kml1wuaNcLmU6TCo'] === 'accept') {
+							   if (acceptedTmplIds.length > 0) {
 								   uni.request({
 									   url: 'https://www.datie123.com/entry/updateSubscription', 
 									   method: 'GET',
@@ -918,7 +954,9 @@ export default {
 										   openid: openid,
 										   unionid: unionid,
 										   entry_id: entryid,
-										   status: status // 1 表示订阅，0 表示取消订阅
+										   status: status ,// 1 表示订阅，0 表示取消订阅
+										   channel:'wx-app',
+										   tmpl_ids:acceptedTmplIds
 									   },
 									   success: (res) => {
 										   if (res.statusCode === 200) {
@@ -946,41 +984,9 @@ export default {
 									});								   
 								   // 可以在这里执行一些操作，比如更新数据库中的用户订阅状态
 							   } else {
-									uni.request({
-									   url: 'https://www.datie123.com/entry/updateSubscription', // 替换成你的服务器地址
-									   method: 'GET',
-									   data: {
-										   openid: openid,
-										   unionid: unionid,
-										   entry_id: entryid,
-										   status: status // 1 表示订阅，0 表示取消订阅
-									   },
-									   success: (res) => {
-										   if (res.statusCode === 200) {
-											   // 更新收藏状态
-											   const newStatus = status === 0; // true 表示订阅，false 表示取消订阅
-											   this.updateRaceList(entryid, newStatus);						   
-											   // 显示对应的提示信息
-											   wx.showToast({
-												   title: status === 1 ? "订阅成功" : "取消订阅成功",
-												   icon: 'success',
-												   duration: 2000
-											   });
-											   } else {
-												   console.error('订阅失败:', res);
-											   }
-									   },
-									   fail: (err) => {
-										   wx.showToast({
-											   title: status === 1 ? "订阅失败" : "取消订阅失败",
-											   icon: 'none',
-											   duration: 2000
-										   });
-										}
-									});								   
-								   // 用户拒绝接收该模板消息
 								   uni.showToast({
-									   title: '您取消了订阅消息',
+									   title: '您尚未订阅！如果要重新订阅，请在设置中打开～',
+									   duration: 1000,
 									   icon: 'none'
 								   });
 							   }
@@ -994,7 +1000,7 @@ export default {
 						   }
 						 });
 					   }else{
-						   // console.error('当前为取消订阅') ;
+						   console.error('当前为取消订阅') ;
 						   uni.request({
 							   url: 'https://www.datie123.com/entry/updateSubscription', // 替换成你的服务器地址
 							   method: 'GET',
@@ -1002,7 +1008,8 @@ export default {
 								   openid: openid,
 								   unionid: unionid,
 								   entry_id: entryid,
-								   status: status // 1 表示订阅，0 表示取消订阅
+								   status: status ,// 1 表示订阅，0 表示取消订阅,
+								   channel:'wx-app',
 							   },
 							   success: (res) => {
 								   if (res.statusCode === 200) {
@@ -1028,8 +1035,114 @@ export default {
 								}
 							});	
 					   }
+					   
 					   						   		   
 			   },
+			   // saveUserInfo(openid, unionid,entryid,status,race) {
+					 //   if(status=='1'){
+						//    console.log('当前为添加订阅');
+						//    this.acceptedTmplIds = []; // 清空之前的结果
+						//    this.processNextSubscription(0); // 开始处理第一个模板消息
+					 //   }else{
+				  //  console.error('当前为取消订阅') ;
+					 //   uni.request({
+						//    url: 'https://www.datie123.com/entry/updateSubscription', // 替换成你的服务器地址
+						//    method: 'GET',
+						//    data: {
+						// 	   openid: openid,
+						// 	   unionid: unionid,
+						// 	   entry_id: entryid,
+						// 	   status: status // 1 表示订阅，0 表示取消订阅
+						//    },
+						//    success: (res) => {
+						// 	   if (res.statusCode === 200) {
+						// 		   // 更新收藏状态
+						// 		   const newStatus = status === 0; // true 表示订阅，false 表示取消订阅
+						// 		   this.updateRaceList(entryid, newStatus);						   
+						// 		   // 显示对应的提示信息
+						// 		   wx.showToast({
+						// 			   title: status === 1 ? "订阅成功" : "取消订阅成功",
+						// 			   icon: 'success',
+						// 			   duration: 2000
+						// 		   });
+						// 		   } else {
+						// 			   console.error('订阅失败:', res);
+						// 		   }
+						//    },
+						//    fail: (err) => {
+						// 	   wx.showToast({
+						// 		   title: status === 1 ? "订阅失败" : "取消订阅失败",
+						// 		   icon: 'none',
+						// 		   duration: 2000
+						// 	   });
+						// 	}
+						// });	
+				  //  }		   					   						   		   
+			   // },		   
+			       processNextSubscription(index) {
+			         if (index >= this.tmplIds.length) {
+			           // 所有模板消息已处理完毕，统一调用更新订阅状态的接口
+			           this.updateSubscription();
+			           return;
+			         }
+			   
+			         let currentTmplId = this.tmplIds[index];
+			   
+			         wx.requestSubscribeMessage({
+			           tmplIds: [currentTmplId],
+			           success: (res) => {
+			             console.log(`用户选择的结果 (${currentTmplId}):`, res[currentTmplId]);
+			             if (res[currentTmplId] === 'accept') {
+			               this.acceptedTmplIds.push(currentTmplId);
+			             }
+			             // 继续处理下一个模板消息
+			             this.processNextSubscription(index + 1);
+			           },
+			           fail: (err) => {
+			             console.error('请求订阅消息失败:', err);
+			             // 即使失败也继续处理下一个模板消息
+			             this.processNextSubscription(index + 1);
+			           }
+			         });
+			       },
+			   
+			       updateSubscription() {
+			         uni.request({
+			           url: 'https://www.datie123.com/entry/updateSubscription',
+			           method: 'POST', // 使用POST方法传递数据
+			           data: {
+			             openid: this.openid,
+			             unionid: this.unionid,
+			             entry_id: this.entryid,
+			             status: 1, // 表示订阅
+			             channel: 'wx-app',
+			             tmpl_ids: this.acceptedTmplIds
+			           },
+			           success: (response) => {
+			             if (response.statusCode === 200) {
+			               // 更新收藏状态
+			               const newStatus = true; // true 表示订阅，false 表示取消订阅
+			               // 遍历 filterRaces 和 races 列表，更新对应的 isNotFavorited 状态
+			               this.updateRaceList(this.entryid, newStatus);
+			               // 显示对应的提示信息
+			               wx.showToast({
+			                 title: "订阅成功",
+			                 icon: 'success',
+			                 duration: 2000
+			               });
+			             } else {
+			               console.error('订阅失败:', response);
+			             }
+			           },
+			           fail: (err) => {
+			             wx.showToast({
+			               title: "订阅失败",
+			               icon: 'none',
+			               duration: 2000
+			             });
+			           }
+			         });
+			       },
 		   updateRaceList(entryId, newStatus) {
 			   // console.error('------调用updateRaceList')
 				   // 遍历 filterRaces 和 races 列表，更新对应的 isNotFavorited 状态
