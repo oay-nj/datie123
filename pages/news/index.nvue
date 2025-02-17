@@ -1118,10 +1118,20 @@
 
 			addSingleStaticsDetail(item) {
 				const currentTime = new Date().toLocaleString();
+				// 获取设备信息
+				const systemInfo = uni.getSystemInfoSync();				
+				// 获取设备型号
+				const deviceModel = systemInfo.model;
 				let detailInfo = {
+					// entry_id: item.entry_id,
+					page_id:'打铁123',
 					entry_id: item.entry_id,
 					element_id: item.id,
-					click_time: currentTime
+					click_time: currentTime,
+					openid:wx.getStorageSync('openid'),
+					unionid:wx.getStorageSync('unionid'),
+					device_id:deviceModel,
+					channel:'web'
 				}
 				uni.request({
 					url: 'https://datie123.com/entry/addSingleStaticsDetail',
