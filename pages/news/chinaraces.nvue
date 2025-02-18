@@ -1,23 +1,36 @@
 <template>
     <view class="box-bg">
         <uni-nav-bar statusBar shadow :border="false" fixed>
-            <!-- <template v-slot:left>
-                <view class="row_style" @click="goHome">
-                    <image class="navi-left-image home-icon" src="/static/home.svg" mode="aspectFit"
-                    />
-                </view>
-            </template> -->
-            <view class="home-icon-bg">
-                <image class="input-view" src="/static/racesbar.png" mode="aspectFit"
-                />
-            </view>
-            <!-- <template v-slot:left>
-                <button class="share-button" @click="handleShare" >
-                    <image class="navi-left-image home-icon" src="/static/ironcat.jpg" mode="aspectFit">
-                    </image>		
-                </button>
-            </template> -->
-        </uni-nav-bar>
+		  <view class="nav-content">
+			<!-- 左边固定图片 -->
+			<view 
+			      class="left-icon" 
+			      :style="leftIconStyle"
+			    >
+			      <image 
+			        v-if="group_id && matchedIcon" 
+			        class="input-view" 
+			        src="/static/datie123.png" 
+			        mode="aspectFit" 
+			        :style="inputViewStyle"
+			      />
+			      <image 
+			        v-else 
+			        class="input-view" 
+			        src="/static/racesbar.png" 
+			        mode="aspectFit" 
+			        :style="inputViewStyle"
+			      />
+			    </view>
+	
+			<!-- 右边动态图片和分隔符 -->
+			<view v-if="group_id && matchedIcon" class="right-icons">
+				<text class="separator">X</text>
+			  <image class="icon" :src="matchedIcon" mode="aspectFit" />
+			  
+			</view>
+		  </view>
+		</uni-nav-bar>
 		<scroll-view class="content-scroll" scroll-y enable-pull-down-refresh 
 		@refresherrefresh="handlePullDownRefresh" :style="{ minHeight: '100px' }" enable-flex>
 			<div class="filter-row" :style="{top: navBarHeight + 'px'}" >
@@ -112,9 +125,9 @@
 		</div>	
 		</scroll-view>
 		<official-account></official-account>
-		<!-- <view class="beian-container">
-			<text class="beian-text" @click="openBeianLink">苏ICP备2022016640号-3</text>
-		</view> -->
+		<view class="beian-container">
+			<text class="beian-text" >Powered By IRONCATS</text>
+		</view>
 	</view>
 </template>
 
@@ -164,6 +177,9 @@ export default {
 		  
 		  tmplIds: ['ycORe8--kFzEp5K2Ty2XJgYzIC7Kml1wuaNcLmU6TCo', 'OhoznUD4OfUo-CYjS1hMQ4ECDymyVK8l25JZnAhB9QE', '1oejuHtf353pPTUblhoqfToXl8d1wN2o60eVuLqMsE8'],
 		  acceptedTmplIds: [], // 用于存储用户同意的模板消息ID
+		  group_id:'',
+		  matchedIcon: '',
+		  showRightIcon: false
 		};
 	  },
 	  onPullDownRefresh() {
@@ -1157,8 +1173,69 @@ export default {
 					   }
 				   });
 			   },
+			   async checkGroupId() {
+				 if (this.group_id) {
+				   try {
+					 const res = await new Promise((resolve, reject) => {
+					   wx.request({
+						 url: `https://www.datie123.com/entry/getSingleEntry?entry_id=${this.group_id}`,
+						 success: function (response) {
+						   resolve(response); // 请求成功，返回响应数据
+						 },
+						 fail: function (error) {
+						   reject(error); // 请求失败，返回错误
+						 }
+					   });
+					 });
+		   
+					 // 如果获取到数据并且有 icon，则设置 matchedIcon
+					 if (res.data && res.data.entry_detail?.icon) {
+					   this.matchedIcon = res.data.entry_detail.icon;
+					   console.error(this.matchedIcon);
+					 }
+				   } catch (error) {
+					 console.error('获取数据失败:', error);
+				   }
+				 }
+			   }
+			  //  async checkGroupId() {
+				 //   console.error('调用checkGroupId')
+				 // if (this.group_id) {
+				 //   try {
+					//  const res = await uni.request({
+					//    url: 'https://www.datie123.com/entry/getSingleEntry',
+					//    data: { 
+					// 	 entry_id: this.group_id
+					//    }
+					//  });
+					//  console.error(res.data.entry_detail)
+					//  if (res.data.entry_detail?.icon) {
+					//    this.matchedIcon = res.data.entry_detail.icon;
+					//    this.showRightIcon = true;
+					//  }
+				 //   } catch (error) {
+					//  console.error('数据获取失败:', error);
+				 //   }
+				 // }
+			  //  }
 	},
-     onLoad() {
+	computed: {
+	    leftIconStyle() {
+	      return this.group_id && this.matchedIcon ? 
+	        { display: 'flex', justifyContent: 'flex-start', alignItems: 'center', width: '120px' } :
+	        { display: 'flex', justifyContent: 'flex-start', alignItems: 'center', width: '20/XMLSchema' };
+	    },
+	    inputViewStyle() {
+	      return this.group_id && this.matchedIcon ? 
+	        { width: '120px', height: '40px' } : 
+	        { width: '200px', height: '40px' };
+	    }
+	  },
+     onLoad: function (options) {
+	  this.group_id=options.group_id;	
+		// this.group_id='CT2501021608519191';
+		// this.group_id='CT2501021609036505';
+		this.checkGroupId();   // 输出：123
 	  // 在组件挂载后调用 fetchRaceData 方法
 	  this.calculateNavBarHeight();
 	  this.fetchRaceDatanit();	  
@@ -1173,7 +1250,7 @@ export default {
 	  },
 	  onShareAppMessage() {
 	    return {
-	      title: '2025国内铁三赛事',
+	      title: '2025国内铁三赛历',
 	      path: '/pages/news/chinaraces', // 注意替换为你的页面路径
 	      imageUrl: 'https://www.datie123.com/images/datie-ironcat.jpg' // 可选
 	    }
@@ -1190,12 +1267,54 @@ export default {
 <style lang="scss">
 	$nav-height: 30px;
 	
-	.loading {
-	  position: absolute;
-	  left: 50%;
-	  top: 10px;
-	  transform: translateX(-50%);
+	.nav-content {
+	  display: flex; /* 使子元素水平排列 */
+	  flex-direction: row;
+	  justify-content: center; /* 修改这里 */
+	  align-items: center; /* 使左右部分垂直居中 */
+	  width: 270px; /* 使用100%宽度，确保能适配各种屏幕 */
+	  height: 40px;
 	}
+	
+	.left-icon {
+	  display: flex;
+	  // justify-content: flex-start;
+	  align-items: center;
+	  // width: 120px;
+	  /* 左侧图标宽度不需要固定，允许根据内容自适应 */
+	}
+	
+	.input-view {
+	  width: 120px; /* 调整图片的宽高 */
+	  height: 40px;
+	}
+	
+	.right-icons {
+		width: 100px;
+		height: 40px;
+	  display: flex;
+	  flex-direction: row;
+	  align-items: center; /* 使左右部分垂直居中 */
+	}
+	
+	.icon {
+	  margin-left: 16px;
+	  width: 40px; /* 调整图片的宽高 */
+	  height: 40px;
+	}
+	
+	.separator {
+	font-size: 28px; /* 设置字体大小为20号 */
+	font-weight: bold; /* 加粗 */
+	color: black; /* 字体颜色为黑色 */
+	margin-left: 16px;
+	}
+	// .loading {
+	//   // position: absolute;
+	//   // left: 50%;
+	//   top: 10px;
+	//   // transform: translateX(-50%);
+	// }
 	
 	.scroll-view {
 	  height: 100%;
@@ -1211,250 +1330,6 @@ export default {
 		background-color: #F5F5F5;
 	}
 	
-	.drawer-text {
-		margin-left: 6px;
-	}
-	
-	.tag-padding {
-		padding-left: 4px;
-		padding-right: 4px;
-		margin-left: 10px;
-	}
-	
-	.grid-item-title {
-		font-size: 12px;
-		color: #333333;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		padding-right: 18px;
-	}
-	
-	.grid-item-title-brand {
-		width: 60px;
-		height: 42px;
-		font-size: 12px;
-		text-align: center;
-		color: #333333;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		padding-right: 18px;
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 2;
-		/* 限制为两行 */
-	}
-	
-	.grid-item-sub-title {
-		font-size: 10px;
-		color: #333333;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		padding-right: 18px;
-	}
-	
-	.tag-sub-padding {
-		padding-left: 4px;
-		padding-right: 4px;
-		margin-right: 5px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-	
-	.drawer-item {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		// flex: 1;
-		flex-direction: row;
-		// background-color: aqua;
-		align-items: center;
-		justify-content: flex-start;
-		margin-left: 16px;
-		margin-bottom: 16px;
-		// width: 160rpx;
-		// margin-left: 4px;
-	}
-	
-	.section-item {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		// flex: 1;
-		flex-direction: row;
-		// background-color: aqua;
-		align-items: center;
-		justify-content: flex-start;
-		margin-top: 6px;
-		// width: 160rpx;
-		// margin-left: 4px;
-	}
-	
-	.section-title-space {
-		display: flex;
-		// flex-grow: 1;
-		flex: 1;
-	}
-	
-	.home-icon-bg {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		// flex: 1;
-		flex-direction: row;
-		// background-color: aqua;
-		align-items: center;
-		height: 100%;
-		width: 420rpx;
-		// width: 160rpx;
-		// margin-left: 4px;
-	}
-	
-	.text-h1 {
-		font-size: 14px;
-		font-weight: bold;
-		color: black;
-	}
-	
-	.text-h2 {
-		font-size: 15px;
-		font-weight: bold;
-		color: black;
-	}
-	
-	.navi-left-image {
-		height: 22px;
-		width: 22px;
-	}
-	
-	.row_style {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		flex-direction: row;
-		align-items: center;
-		justify-content: flex-start;
-	}
-	
-	.cell-card {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-	}
-	
-	.tag-container {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		flex-direction: row;
-		margin-top: 8px;
-		align-items: center;
-		justify-content: center;
-	}
-	
-	.rank2-tag-container {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		flex-direction: row;
-		align-items: center;
-		justify-content: center;
-	}
-	
-	.new-badge-image {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		width: 20px;
-		height: 20px;
-	}
-	
-	.section-image {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		width: 20px;
-		height: 20px;
-	}
-	
-	.section-image-drop-down {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		width: 28px;
-		height: 30px;
-	}
-	
-	.image-padding-left {
-		width: 14px;
-		height: 14px;
-		padding-left: 1px;
-	}
-	
-	.hr-line {
-		height: 1px;
-		/* 线的高 */
-		background-color: #e5e5e5;
-		/* 线的颜色 */
-		border: none;
-		/* 去除边框 */
-		margin: 4px 0;
-		/* 上下外边距 */
-	}
-	
-	.drawer-image {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		flex: 1;
-		width: 60%;
-		// background-color: #ff0000;
-	}
-	
-	.input-view {
-		/* #ifndef APP-PLUS-NVUE */
-		display: flex;
-		/* #endif */
-		flex: 1;
-		// width: 100%;
-		flex-direction: row-reverse;
-		// background-color: #ff0000;
-		height: 90%;
-		flex-wrap: nowrap;
-	}
-	
-	.beian-container {
-		padding: 10px;
-		text-align: center;
-		font-size: 14px;
-		color: #999;
-	}
-	
-	.beian-text {
-		margin-right: 8px;
-	}
-	
-	.beian-link {
-		color: #999;
-		text-decoration: none;
-		/* 取消下划线 */
-	}
-	
-	.swiper-box {
-		height: 100px;
-	}
-	
-	.swiper-item {
-		/* #ifndef APP-NVUE */
-		display: flex;
-		/* #endif */
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		height: 50px;
-	}
 	//以下是下拉框的样式
 
 	.filter-row {
@@ -1776,7 +1651,7 @@ export default {
 	  flex-direction: row;
 	  align-items: center; /* 使左右部分垂直居中 */
 	  height: 24px;
-	  // width: 200px;
+	  // width: 100px;
 	  margin-left: 10px;
 	  margin-top: 8px;
 	}
@@ -1939,5 +1814,16 @@ export default {
 	.dropdown-item {
 	  padding: 10px;
 	  cursor: pointer;
+	}
+	
+	.beian-container {
+		padding: 5px;
+		text-align: center;
+		font-size: 14px;
+		color: #999;
+	}
+	
+	.beian-text {
+		margin-right: 8px;
 	}
 </style>

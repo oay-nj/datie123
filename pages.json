@@ -2,7 +2,7 @@
 	"pages": [{
 			"path": "pages/news/chinaraces",
 			"style": {
-				"navigationBarTitleText": "2025国内铁三赛事",
+				"navigationBarTitleText": "2025国内铁三赛历",
 				"enablePullDownRefresh": true
 			}
 		},
