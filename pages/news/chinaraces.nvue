@@ -1252,8 +1252,8 @@ export default {
 				  position: 'absolute', // 子元素使用绝对定位
 				  right: '20px', // 距离右侧20px
 		          width: '60%',
-		          height: '30px',
-				  top: '5px', // 增加距离顶部5px
+		          height: '24px',
+				  top: '8px', // 增加距离顶部5px
 		        }
 		      : {
 		          width: '100%',
