@@ -5,7 +5,7 @@
 			<status-bar v-if="statusBar" />
 			<view :style="{ color: themeColor,backgroundColor: themeBgColor ,height:navbarHeight}"
 				class="uni-navbar__header">
-				<view @tap="onClickLeft" class="uni-navbar__header-btns uni-navbar__header-btns-left"
+				<!-- <view @tap="onClickLeft" class="uni-navbar__header-btns uni-navbar__header-btns-left"
 					:style="{width:leftIconWidth}">
 					<slot name="left">
 						<view class="uni-navbar__content_view" v-if="leftIcon.length > 0">
@@ -16,7 +16,7 @@
 							<text :style="{ color: themeColor, fontSize: '12px' }">{{ leftText }}</text>
 						</view>
 					</slot>
-				</view>
+				</view> -->
 				<view class="uni-navbar__header-container " @tap="onClickTitle">
 					<slot>
 						<view class="uni-navbar__header-container-inner" v-if="title.length>0">
@@ -25,7 +25,7 @@
 						</view>
 					</slot>
 				</view>
-				<view @click="onClickRight" class="uni-navbar__header-btns uni-navbar__header-btns-right"
+				<!-- <view @click="onClickRight" class="uni-navbar__header-btns uni-navbar__header-btns-right"
 					:style="{width:rightIconWidth}">
 					<slot name="right">
 						<view v-if="rightIcon.length">
@@ -35,7 +35,7 @@
 							<text class="uni-nav-bar-right-text" :style="{ color: themeColor}">{{ rightText }}</text>
 						</view>
 					</slot>
-				</view>
+				</view> -->
 			</view>
 		</view>
 		<!-- #ifndef APP-NVUE -->

@@ -1,33 +1,29 @@
 <template>
     <view class="box-bg">
-        <uni-nav-bar statusBar shadow :border="false" fixed>
+        <uni-nav-bar statusBar="none" shadow :border="false" fixed>
 		  <view class="nav-content">
 			<!-- 左边固定图片 -->
 			<view 
-			      class="left-icon" 
 			      :style="leftIconStyle"
 			    >
 			      <image 
 			        v-if="group_id && matchedIcon" 
-			        class="input-view" 
 			        src="/static/datie123.png" 
-			        mode="aspectFit" 
+			        mode="heightFix" 
 			        :style="inputViewStyle"
 			      />
 			      <image 
 			        v-else 
-			        class="input-view" 
 			        src="/static/racesbar.png" 
-			        mode="aspectFit" 
+			        mode="heightFix" 
 			        :style="inputViewStyle"
 			      />
 			    </view>
 	
 			<!-- 右边动态图片和分隔符 -->
-			<view v-if="group_id && matchedIcon" class="right-icons">
-				<text class="separator">X</text>
-			  <image class="icon" :src="matchedIcon" mode="aspectFit" />
-			  
+			<text v-if="group_id && matchedIcon" class="separator">X</text>
+			<view v-if="group_id && matchedIcon" class="right-icons">			
+			  <image class="icon" :src="matchedIcon" mode="heightFix" />			  
 			</view>
 		  </view>
 		</uni-nav-bar>
@@ -75,7 +71,7 @@
 				      <span class="text">{{ race.title }}</span>
 				  </div>
 				   <img 
-				          :src="race.isNotFavorited ? '/static/通知-已订阅.svg' : '/static/通知-未订阅.svg'" 
+				          :src="race.isNotFavorited ? '/static/通知_fill.svg' : '/static/通知-未订阅.svg'" 
 				          alt="收藏图标" 
 				          class="favorites-icon" 
 				          @click="checkAuthorization(race)" 
@@ -179,7 +175,8 @@ export default {
 		  acceptedTmplIds: [], // 用于存储用户同意的模板消息ID
 		  group_id:'',
 		  matchedIcon: '',
-		  showRightIcon: false
+		  showRightIcon: false,
+		  isRequestingSubscription: false, // 标记是否正在请求订阅
 		};
 	  },
 	  onPullDownRefresh() {
@@ -465,7 +462,7 @@ export default {
 			title: '2025国内铁三赛事', // 分享标题
 			desc: '提供最新国内铁人三项赛事信息', // 分享描述
 			link: 'https://www.datie123.com/#/pages/news/chinaraces', // 分享链接
-			imgUrl: 'https://www.datie123.com/images/share.jpg', // 分享图标		
+			imgUrl: 'https://www.datie123.com/images/share-new.jpg', // 分享图标		
 		  };		
 			  wx.updateAppMessageShareData({
 				...shareData,
@@ -947,9 +944,19 @@ export default {
 				   });
 			   },
 			   saveUserInfo(openid, unionid,entryid,status,race) {
+					if (this.isRequestingSubscription) {
+					 wx.showToast({
+					   title: '您点击的太快啦！',
+					   icon: 'none',
+					   duration: 1000
+					 });
+					 return;
+				   }
 				   this.saveUserProfilesInfo(openid, unionid);
+				   
 					   if(status=='1'){
 						console.error('当前为添加订阅');
+						this.isRequestingSubscription=true;
 						 wx.requestSubscribeMessage({
 						   tmplIds: ['ycORe8--kFzEp5K2Ty2XJgYzIC7Kml1wuaNcLmU6TCo','OhoznUD4OfUo-CYjS1hMQ4ECDymyVK8l25JZnAhB9QE','1oejuHtf353pPTUblhoqfToXl8d1wN2o60eVuLqMsE8'],
 						   success: (res) => {
@@ -1013,6 +1020,10 @@ export default {
 								   title: '请求订阅消息失败，请稍后再试',
 								   icon: 'none'
 							   });
+						   },
+						   complete: () => {
+								 // 请求完成后，无论成功还是失败，都重置标记
+								 this.isRequestingSubscription=false;
 						   }
 						 });
 					   }else{
@@ -1220,21 +1231,40 @@ export default {
 			  //  }
 	},
 	computed: {
-	    leftIconStyle() {
-	      return this.group_id && this.matchedIcon ? 
-	        { display: 'flex', justifyContent: 'flex-start', alignItems: 'center', width: '120px' } :
-	        { display: 'flex', justifyContent: 'flex-start', alignItems: 'center', width: '20/XMLSchema' };
-	    },
-	    inputViewStyle() {
-	      return this.group_id && this.matchedIcon ? 
-	        { width: '120px', height: '40px' } : 
-	        { width: '200px', height: '40px' };
-	    }
-	  },
+		leftIconStyle() {
+		    return this.group_id && this.matchedIcon 
+		      ? { 
+		          position: 'relative', // 父容器需要相对定位
+				width: '47.5%',
+				height: '40px' // 如果需要固定高度
+			  }
+			: { 
+				display: 'flex', 
+				justifyContent: 'flex-start', 
+				width: '66%',
+				height: '40px' ,// 如果需要固定高度
+				};
+		  },
+		
+		  inputViewStyle() {
+		    return this.group_id && this.matchedIcon
+		      ? {
+				  position: 'absolute', // 子元素使用绝对定位
+				  right: '20px', // 距离右侧20px
+		          width: '60%',
+		          height: '30px',
+				  top: '5px', // 增加距离顶部5px
+		        }
+		      : {
+		          width: '100%',
+		          height: '30px',
+		        };
+		  }
+	},
      onLoad: function (options) {
 	  this.group_id=options.group_id;	
 		// this.group_id='CT2501021608519191';
-		// this.group_id='CT2501021609036505';
+		// this.group_id='CT2501021608552177';
 		this.checkGroupId();   // 输出：123
 	  // 在组件挂载后调用 fetchRaceData 方法
 	  this.calculateNavBarHeight();
@@ -1249,16 +1279,17 @@ export default {
 	    })
 	  },
 	  onShareAppMessage() {
-	    return {
-	      title: '2025国内铁三赛历',
-	      path: '/pages/news/chinaraces', // 注意替换为你的页面路径
-	      imageUrl: 'https://www.datie123.com/images/datie-ironcat.jpg' // 可选
-	    }
+	    const path = this.group_id ? `/pages/news/chinaraces?group_id=${this.group_id}` : '/pages/news/chinaraces';
+	        return {
+	            title: '2025国内铁三赛历',
+	            path: path, // 根据 group_id 动态生成路径
+	            imageUrl: 'https://www.datie123.com/images/share-new.jpg' // 可选
+	        }
 	  },
 	  onShareTimeline() {
 	      return {
 	        title: '2025国内铁三赛事',
-			imageUrl: 'https://www.datie123.com/images/datie-ironcat.jpg' // 可选
+			imageUrl: 'https://www.datie123.com/images/share-new.jpg' // 可选
 	      }
 	    }
 }
@@ -1272,42 +1303,31 @@ export default {
 	  flex-direction: row;
 	  justify-content: center; /* 修改这里 */
 	  align-items: center; /* 使左右部分垂直居中 */
-	  width: 270px; /* 使用100%宽度，确保能适配各种屏幕 */
+	  width: 100%; /* 使用100%宽度，确保能适配各种屏幕 */
 	  height: 40px;
 	}
-	
-	.left-icon {
-	  display: flex;
-	  // justify-content: flex-start;
-	  align-items: center;
-	  // width: 120px;
-	  /* 左侧图标宽度不需要固定，允许根据内容自适应 */
-	}
-	
-	.input-view {
-	  width: 120px; /* 调整图片的宽高 */
-	  height: 40px;
-	}
-	
+
+
 	.right-icons {
-		width: 100px;
+		width: 47.5%;
 		height: 40px;
-	  display: flex;
-	  flex-direction: row;
-	  align-items: center; /* 使左右部分垂直居中 */
+	    display: flex;
+	  	justify-content: flex-start; /* 确保内容从左侧开始 */
+	  	// align-items: center; /* 垂直居中对齐，如果需要 */
 	}
 	
 	.icon {
-	  margin-left: 16px;
-	  width: 40px; /* 调整图片的宽高 */
+	  margin-left: 20px;
+	  // width: 80px; /* 调整图片的宽高 */
 	  height: 40px;
 	}
 	
 	.separator {
-	font-size: 28px; /* 设置字体大小为20号 */
+	font-size: 20px; /* 设置字体大小为20号 */
 	font-weight: bold; /* 加粗 */
 	color: black; /* 字体颜色为黑色 */
-	margin-left: 16px;
+	// margin-left: 10px;
+	width: 5%;
 	}
 	// .loading {
 	//   // position: absolute;
